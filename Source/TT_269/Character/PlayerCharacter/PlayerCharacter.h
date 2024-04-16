@@ -6,6 +6,9 @@
 #include "GameFramework/Character.h"
 #include "PlayerCharacter.generated.h"
 
+class USpringArmComponent;
+class UCameraComponent;
+
 UCLASS()
 class TT_269_API APlayerCharacter : public ACharacter
 {
@@ -18,6 +21,19 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	// Camera:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "PlayerCharacter | Camera")
+	USpringArmComponent* CameraSpringArm = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "PlayerCharacter | Camera")
+	UCameraComponent* MainCamera = nullptr;
+
+	// Movement logic:
+	UFUNCTION(BlueprintCallable, Category = "PlayerCharacter | Movement")
+	void MoveToForward(float Axis);
+	UFUNCTION(BlueprintCallable, Category = "PlayerCharacter | Movement")
+	void MoveToRight(float Axis);
 
 public:	
 	// Called every frame
