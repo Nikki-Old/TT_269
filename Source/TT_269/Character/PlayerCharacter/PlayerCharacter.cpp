@@ -3,6 +3,7 @@
 #include "PlayerCharacter.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/ArrowComponent.h"
 #include "Components/CapsuleComponent.h"
 
 // Sets default values
@@ -13,12 +14,16 @@ APlayerCharacter::APlayerCharacter()
 
 	// Create camera spring arm and set settings:
 	CameraSpringArm = CreateDefaultSubobject<USpringArmComponent>("CameraSpringArm");
-	CameraSpringArm->SetupAttachment(GetMesh());
+	CameraSpringArm->SetupAttachment(GetCapsuleComponent());
 	CameraSpringArm->bDoCollisionTest = false;
 
 	// Create camera and set settings:
 	MainCamera = CreateDefaultSubobject<UCameraComponent>("MainCamera");
 	MainCamera->SetupAttachment(CameraSpringArm, CameraSpringArm->SocketName);
+
+	// Create arrow for camera forward vector:
+	MainCameraForward = CreateDefaultSubobject<UArrowComponent>("MainCameraForward");
+	MainCameraForward->SetupAttachment(MainCamera);
 }
 
 // Called when the game starts or when spawned
@@ -30,13 +35,13 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::MoveToForward(float Axis)
 {
 	// Movement direction = Capsule forward vecror * Axis:
-	this->AddMovementInput((GetCapsuleComponent()->GetForwardVector() * Axis));
+	this->AddMovementInput((MainCameraForward->GetForwardVector() * Axis));
 }
 
 void APlayerCharacter::MoveToRight(float Axis)
 {
 	// Movement direction = Capsule right vecror * Axis:
-	this->AddMovementInput((GetCapsuleComponent()->GetRightVector() * Axis));
+	this->AddMovementInput((MainCamera->GetRightVector() * Axis));
 }
 
 // Called every frame

@@ -8,6 +8,7 @@
 
 class USpringArmComponent;
 class UCameraComponent;
+class UArrowComponent;
 
 UCLASS()
 class TT_269_API APlayerCharacter : public ACharacter
@@ -28,6 +29,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "PlayerCharacter | Camera")
 	UCameraComponent* MainCamera = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "PlayerCharacter | Camera")
+	UArrowComponent* MainCameraForward = nullptr;
 
 	// Movement logic:
 	UFUNCTION(BlueprintCallable, Category = "PlayerCharacter | Movement")

@@ -16,11 +16,14 @@ class TT_269_API APlayerControllerMain : public APlayerController
 {
 	GENERATED_BODY()
 
+public:
+	UFUNCTION(BlueprintCallable, Category = "PlayerController | Inputs")
+	void SetInputMapping(UInputMappingContext* NewInputMapping);
+
 protected:
 	virtual void SetupInputComponent() override;
 
 	/** MappingContext for player input. */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Inputs")
-	UInputMappingContext* InputMapping = nullptr;
-
+	UPROPERTY(BlueprintReadOnly, Category = "Inputs")
+	UInputMappingContext* CurrentInputMapping = nullptr;
 };
