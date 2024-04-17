@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -24,6 +25,11 @@ APlayerCharacter::APlayerCharacter()
 	// Create arrow for camera forward vector:
 	MainCameraForward = CreateDefaultSubobject<UArrowComponent>("MainCameraForward");
 	MainCameraForward->SetupAttachment(MainCamera);
+
+	// Create interact collision:
+	InteractCollision = CreateDefaultSubobject<USphereComponent>("InteractCollision");
+	InteractCollision->SetupAttachment(GetMesh());
+	InteractCollision->SetCollisionProfileName("InteractProfile");
 }
 
 // Called when the game starts or when spawned

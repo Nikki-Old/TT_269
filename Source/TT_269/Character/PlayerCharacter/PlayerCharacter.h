@@ -9,6 +9,7 @@
 class USpringArmComponent;
 class UCameraComponent;
 class UArrowComponent;
+class USphereComponent;
 
 UCLASS()
 class TT_269_API APlayerCharacter : public ACharacter
@@ -32,6 +33,10 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "PlayerCharacter | Camera")
 	UArrowComponent* MainCameraForward = nullptr;
+
+	/** For find with other can interact: */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PickUp")
+	USphereComponent* InteractCollision = nullptr;
 
 	// Movement logic:
 	UFUNCTION(BlueprintCallable, Category = "PlayerCharacter | Movement")
