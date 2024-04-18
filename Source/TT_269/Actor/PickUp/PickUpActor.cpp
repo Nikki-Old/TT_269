@@ -2,6 +2,7 @@
 
 
 #include "PickUpActor.h"
+#include "DataAsset/PickUp/PickUpDataAsset.h"
 
 // Sets default values
 APickUpActor::APickUpActor()
@@ -28,3 +29,27 @@ void APickUpActor::Tick(float DeltaTime)
 
 }
 
+bool APickUpActor::IsCanInteract_Implementation() const
+{
+	return false;
+}
+
+bool APickUpActor::ShowCanInteract_Implementation()
+{
+	return false;
+}
+
+bool APickUpActor::UnShowCanInteract_Implementation()
+{
+	return false;
+}
+
+bool APickUpActor::StartInteract_Implementation(AActor* InteractInstigator)
+{
+	return false;
+}
+
+bool APickUpActor::StopInteract_Implementation()
+{
+	return false;
+}

@@ -10,6 +10,8 @@ public class TT_269 : ModuleRules
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
 
+		PublicIncludePaths.AddRange(new string[] { "TT_269", "TT_269/Interface", "TT_269/DataAsset", "TT_269/ActorComponent" });
+
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
 		// Uncomment if you are using Slate UI

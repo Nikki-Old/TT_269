@@ -29,17 +29,17 @@ public:
 
 	/** Show signal: "Can interact!" */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interact")
-	void ShowCanInteract();
+	bool ShowCanInteract();
 
 	/** Un show signal: "Can interact!" */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interact")
-	void UnShowCanInteract();
+	bool UnShowCanInteract();
 
 	/** Start interact with param: Instigator interaction.  */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interact")
-	void StartInteract(AActor* Instigator);
+	bool StartInteract(AActor* InteractInstigator);
 
 	/** Stop interact */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interact")
-	void StopInteract();
+	bool StopInteract();
 };

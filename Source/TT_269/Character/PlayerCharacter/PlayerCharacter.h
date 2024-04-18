@@ -10,6 +10,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UArrowComponent;
 class USphereComponent;
+class UInteractSphereComponent;
 
 UCLASS()
 class TT_269_API APlayerCharacter : public ACharacter
@@ -36,7 +37,7 @@ protected:
 
 	/** For find with other can interact: */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PickUp")
-	USphereComponent* InteractCollision = nullptr;
+	UInteractSphereComponent* InteractSphere = nullptr;
 
 	// Movement logic:
 	UFUNCTION(BlueprintCallable, Category = "PlayerCharacter | Movement")

@@ -7,6 +7,8 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 
+#include "ActorComponent/InteractSphere/InteractSphereComponent.h"
+
 // Sets default values
 APlayerCharacter::APlayerCharacter()
 {
@@ -27,9 +29,8 @@ APlayerCharacter::APlayerCharacter()
 	MainCameraForward->SetupAttachment(MainCamera);
 
 	// Create interact collision:
-	InteractCollision = CreateDefaultSubobject<USphereComponent>("InteractCollision");
-	InteractCollision->SetupAttachment(GetMesh());
-	InteractCollision->SetCollisionProfileName("InteractProfile");
+	InteractSphere = CreateDefaultSubobject<UInteractSphereComponent>("InteractCollision");
+	InteractSphere->SetupAttachment(GetMesh());
 }
 
 // Called when the game starts or when spawned
