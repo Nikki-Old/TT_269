@@ -9,6 +9,9 @@
 /**
  *
  */
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnFindInteractActor, AActor*, NewTargetActor);
+
 UCLASS()
 class TT_269_API UInteractSphereComponent : public USphereComponent
 {
@@ -17,8 +20,13 @@ class TT_269_API UInteractSphereComponent : public USphereComponent
 public:
 	UInteractSphereComponent();
 
-protected:
+	UPROPERTY(BlueprintAssignable, Category = "InteractSphere")
+	FOnFindInteractActor OnFindInteractActor;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "InteractSphere")
+	FORCEINLINE AActor* GetCurrentInteractTarget() const { return CurrentInteractTarget; };
+
+protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "InteractSphere")
 	void OnBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	void OnBeginOverlap_Implementation(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -26,4 +34,8 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "InteractSphere")
 	void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 	void OnEndOverlap_Implementation(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+private:
+	UPROPERTY()
+	AActor* CurrentInteractTarget = nullptr;
 };
