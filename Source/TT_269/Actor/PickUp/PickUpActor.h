@@ -9,7 +9,7 @@
 #include "PickUpActor.generated.h"
 
 class USphereComponent;
-class UPickUpDataAsset;
+class UItemDataAsset;
 
 UCLASS()
 class TT_269_API APickUpActor : public AActor, public IInteractInterface
@@ -22,7 +22,7 @@ public:
 
 	/** Get PickUpDataAsset */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "PickUp")
-	void GetPickUpDataAsset(UPickUpDataAsset*& OutInfo) const { OutInfo = PickUpDataAsset; }
+	void GetItemDataAsset(UItemDataAsset*& OutInfo) const { OutInfo = ItemDataAsset; }
 
 #pragma region IInteractInterface
 
@@ -62,7 +62,7 @@ protected:
 	USceneComponent* SceneComponent = nullptr;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "PickUp", meta = (ExposeOnSpawn = true))
-	UPickUpDataAsset* PickUpDataAsset = nullptr;
+	UItemDataAsset* ItemDataAsset = nullptr;
 
 public:
 	// Called every frame

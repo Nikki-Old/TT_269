@@ -2,7 +2,7 @@
 
 
 #include "PickUpActor.h"
-#include "DataAsset/PickUp/PickUpDataAsset.h"
+#include "ItemDataAsset/ItemDataAsset.h"
 
 // Sets default values
 APickUpActor::APickUpActor()
