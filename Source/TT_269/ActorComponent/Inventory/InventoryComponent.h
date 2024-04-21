@@ -27,7 +27,7 @@ public:
 	void GetInventoryInfo(TArray<FInventorySlotInfo>& OutInfo) const { OutInfo = InventoryInfo; }
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	bool AddItemInfo(const FItemActorInfo& NewItemInfo, int32 Quantity);
+	virtual bool AddItemInfo(const FItemActorInfo& NewItemInfo, int32 Quantity);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Inventory")
 	int32 IsHaveItemByName(const FName& TargetName, FInventorySlotInfo& OutInventroySlot) const;

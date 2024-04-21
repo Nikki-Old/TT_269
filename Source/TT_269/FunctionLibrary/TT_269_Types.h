@@ -78,6 +78,17 @@ USTRUCT(BlueprintType)
 struct FAmmoActorInfo : public FInventorySlotInfo
 {
 	GENERATED_BODY()
+
+	FAmmoActorInfo() { ItemType = EItemType::Ammo_Type; }
+};
+
+// Item type:
+UENUM(BlueprintType)
+enum class EWeaponSlotType : uint8
+{
+	None_Type UMETA(DisplayName = "None"),
+	First_Type UMETA(DisplayName = "First"),
+	Second_Type UMETA(DisplayName = "Second")
 };
 
 USTRUCT(BlueprintType)
@@ -86,13 +97,21 @@ struct FWeaponActorInfo : public FInventorySlotInfo
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
-	UStaticMesh* Mesh = nullptr;
-
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
 	FName DisplayName = "";
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
+	EWeaponSlotType WeaponSlotType;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
+	UStaticMesh* PickUpMesh = nullptr;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
+	USkeletalMesh* SkeletalMesh = nullptr;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
 	FAmmoActorInfo AmmoActorInfo = FAmmoActorInfo();
+
+	FWeaponActorInfo() { ItemType = EItemType::Weapon_Type; };
 };
 
 UCLASS()
