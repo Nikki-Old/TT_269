@@ -3,19 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "WeaponMain.h"
-#include "DistanceWeaponMain.generated.h"
+#include "GameFramework/Actor.h"
+#include "WeaponMain.generated.h"
 
 UCLASS()
-class TT_269_API ADistanceWeaponMain : public AWeaponMain
+class TT_269_API AWeaponMain : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ADistanceWeaponMain();
-
-	void SetWeaponReady(bool bIsReady);
+	AWeaponMain();
 
 protected:
 	// Called when the game starts or when spawned

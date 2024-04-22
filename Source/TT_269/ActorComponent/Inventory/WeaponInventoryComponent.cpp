@@ -1,19 +1,40 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "ActorComponent/Inventory/WeaponInventoryComponent.h"
+#include "GameInstance/GameInstanceMain.h"
 
 UWeaponInventoryComponent::UWeaponInventoryComponent()
 {
-	WeaponsInfo.Add(TTuple<EWeaponSlotType, FInventorySlotInfo>(EWeaponSlotType::First_Type, FInventorySlotInfo()));
-	WeaponsInfo.Add(TTuple<EWeaponSlotType, FInventorySlotInfo>(EWeaponSlotType::Second_Type, FInventorySlotInfo()));
+	WeaponsInfo.Add(TTuple<EWeaponSlotType, FWeaponActorInfo>(EWeaponSlotType::First_Type, FWeaponActorInfo()));
+	WeaponsInfo.Add(TTuple<EWeaponSlotType, FWeaponActorInfo>(EWeaponSlotType::Second_Type, FWeaponActorInfo()));
 }
 
 bool UWeaponInventoryComponent::AddItemInfo(const FItemActorInfo& NewItemInfo, int32 Quantity)
 {
 	if (!NewItemInfo.IsEmpty())
 	{
+		if (NewItemInfo.ItemType == EItemType::Weapon_Type)
+		{
+			FWeaponActorInfo NewWeaponInfo;
 
+			if (GetGameInstanceMain()->GetWeaponInfoByName(NewItemInfo.ItemName, NewWeaponInfo))
+			{
+				NewWeaponInfo.AmmoActorInfo.ItemQuantity = Quantity;
+
+				FWeaponActorInfo CurrentWeaponInfo;
+				bool bIsFree = IsHaveFreeSlot(NewWeaponInfo.WeaponSlotType, CurrentWeaponInfo);
+
+				WeaponsInfo[NewWeaponInfo.WeaponSlotType] = NewWeaponInfo;
+				OnUpdateWeaponSlot.Broadcast(NewWeaponInfo.WeaponSlotType, NewWeaponInfo);
+
+				if (!bIsFree)
+				{
+					// TO DO: logic for drop weapon:
+				}
+
+				return true;
+			}
+		}
 	}
 	else
 	{
@@ -21,4 +42,21 @@ bool UWeaponInventoryComponent::AddItemInfo(const FItemActorInfo& NewItemInfo, i
 	}
 
 	return Super::AddItemInfo(NewItemInfo, Quantity);
+}
+
+bool UWeaponInventoryComponent::IsHaveFreeSlot(EWeaponSlotType TargetType, FWeaponActorInfo& TargetInfo) const
+{
+	if (WeaponsInfo.Contains(TargetType))
+	{
+		if (WeaponsInfo[TargetType].IsEmpty())
+		{
+			return true;
+		}
+		else
+		{
+			TargetInfo = WeaponsInfo[TargetType];
+		}
+	}
+
+	return false;
 }

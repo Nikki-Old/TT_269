@@ -19,9 +19,12 @@ class TT_269_API UItemDataAsset : public UDataAsset
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "ItemDataAsset")
+	void SetItemInfo(const FItemActorInfo& NewInfo) { ItemInfo = NewInfo; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "ItemDataAsset")
 	void GetItemInfo(FItemActorInfo& OutInfo) { OutInfo = ItemInfo; }
 
 protected:
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "ItemDataAsset")
+	UPROPERTY(EditDefaultsOnly, Category = "ItemDataAsset")
 	FItemActorInfo ItemInfo = FItemActorInfo();
 };

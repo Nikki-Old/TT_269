@@ -8,18 +8,31 @@
 #include "WeaponInventoryComponent.generated.h"
 
 /**
- * 
+ *
  */
 
-UCLASS()
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnUpdateWeaponSlot, EWeaponSlotType, SlotType, FWeaponActorInfo, WeaponActorInfo);
+
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class TT_269_API UWeaponInventoryComponent : public UInventoryComponent
 {
 	GENERATED_BODY()
-	
+
 public:
 	UWeaponInventoryComponent();
 
+	UPROPERTY(BlueprintAssignable, Category = "WeaponInventory")
+	FOnUpdateWeaponSlot OnUpdateWeaponSlot;
+
 	virtual bool AddItemInfo(const FItemActorInfo& NewItemInfo, int32 Quantity) override;
 
-	TMap<EWeaponSlotType, FInventorySlotInfo> WeaponsInfo = {};
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "WeaponInventory")
+	void GetWeaponsInfo(TMap<EWeaponSlotType, FWeaponActorInfo>& OutInfo) { OutInfo = WeaponsInfo; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "WeaponInventory")
+	bool IsHaveFreeSlot(EWeaponSlotType TargetType, FWeaponActorInfo& TargetInfo) const;
+
+private:
+	UPROPERTY()
+	TMap<EWeaponSlotType, FWeaponActorInfo> WeaponsInfo = {};
 };

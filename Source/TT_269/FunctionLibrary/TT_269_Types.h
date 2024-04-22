@@ -7,6 +7,8 @@
 #include "Engine/DataTable.h"
 #include "TT_269_Types.generated.h"
 
+class AWeaponMain;
+
 /**
  *
  */
@@ -35,7 +37,7 @@ struct FItemActorInfo : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemInfo")
 	FName ItemName = "";
 
-	bool IsEmpty() const
+	virtual bool IsEmpty() const
 	{
 		if (ItemType == EItemType::None_Type)
 		{
@@ -100,18 +102,38 @@ struct FWeaponActorInfo : public FInventorySlotInfo
 	FName DisplayName = "";
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
+	TSubclassOf<AWeaponMain> WeaponClass = nullptr;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
 	EWeaponSlotType WeaponSlotType;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
-	UStaticMesh* PickUpMesh = nullptr;
-
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
-	USkeletalMesh* SkeletalMesh = nullptr;
+	TSoftObjectPtr<UStaticMesh> PickUpMesh = nullptr;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
 	FAmmoActorInfo AmmoActorInfo = FAmmoActorInfo();
 
 	FWeaponActorInfo() { ItemType = EItemType::Weapon_Type; };
+
+	virtual bool IsEmpty() const override
+	{
+		if (ItemType == EItemType::None_Type)
+		{
+			return true;
+		}
+
+		if (ItemName.IsNone())
+		{
+			return true;
+		}
+
+		if (DisplayName.IsNone())
+		{
+			return true;
+		}
+
+		return false;
+	}
 };
 
 UCLASS()

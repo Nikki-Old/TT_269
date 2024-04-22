@@ -41,6 +41,9 @@ protected:
 
 	bool CreateNewInventorySlot(const FItemActorInfo& NewItemInfo, int32 Quantity);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Inventory")
+	UGameInstanceMain* GetGameInstanceMain() const { return GameInstanceMain; }
+
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
