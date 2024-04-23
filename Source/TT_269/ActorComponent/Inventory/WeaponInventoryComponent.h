@@ -12,6 +12,7 @@
  */
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnUpdateWeaponSlot, EWeaponSlotType, SlotType, FWeaponActorInfo, WeaponActorInfo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnUpdateCurrentWeaponSlot, EWeaponSlotType, SlotType, FWeaponActorInfo, WeaponActorInfo);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class TT_269_API UWeaponInventoryComponent : public UInventoryComponent
@@ -24,6 +25,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "WeaponInventory")
 	FOnUpdateWeaponSlot OnUpdateWeaponSlot;
 
+	UPROPERTY(BlueprintAssignable, Category = "WeaponInventory")
+	FOnUpdateCurrentWeaponSlot OnUpdateCurrentWeaponSlot;
+
 	virtual bool AddItemInfo(const FItemActorInfo& NewItemInfo, int32 Quantity) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "WeaponInventory")
@@ -32,7 +36,15 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "WeaponInventory")
 	bool IsHaveFreeSlot(EWeaponSlotType TargetType, FWeaponActorInfo& TargetInfo) const;
 
+	UFUNCTION(BlueprintCallable, Category = "WeaponInventory")
+	bool SetCurrentWeaponInfoBySlotType(EWeaponSlotType TargetSlotType, FWeaponActorInfo& CurrentWeaponInfo);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "WeaponInventory")
+	void GetCurrentWeaponInfoSlot(EWeaponSlotType& OutInfo) const { OutInfo = CurrentWeaponInfoSlot; }
+
 private:
 	UPROPERTY()
 	TMap<EWeaponSlotType, FWeaponActorInfo> WeaponsInfo = {};
+
+	EWeaponSlotType CurrentWeaponInfoSlot = EWeaponSlotType::None_Type;
 };

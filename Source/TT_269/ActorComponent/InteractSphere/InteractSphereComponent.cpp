@@ -14,6 +14,53 @@ UInteractSphereComponent::UInteractSphereComponent()
 	this->OnComponentEndOverlap.AddDynamic(this, &UInteractSphereComponent::OnEndOverlap);
 }
 
+void UInteractSphereComponent::CheckOverlaps()
+{
+	TArray<AActor*> OverlappingActors;
+	this->GetOverlappingActors(OverlappingActors);
+
+	AActor* BestTarget = nullptr;
+
+	if (OverlappingActors.IsValidIndex(0))
+	{
+		BestTarget = OverlappingActors[0];
+	}
+	else
+	{
+		return;
+	}
+
+	if (OverlappingActors.Num() > 1)
+	{
+
+		for (const auto& Actor : OverlappingActors)
+		{
+			if (BestTarget == Actor)
+			{
+				continue;
+			}
+
+			const auto BestTargetDistance = UKismetMathLibrary::Vector_Distance(GetOwner()->GetActorLocation(), BestTarget->GetActorLocation());
+			const auto NewTargetDistance = UKismetMathLibrary::Vector_Distance(GetOwner()->GetActorLocation(), Actor->GetActorLocation());
+
+			if (BestTargetDistance > NewTargetDistance)
+			{
+				BestTarget = Actor;
+			}
+		}
+	}
+
+	if (BestTarget)
+	{
+		if (IInteractInterface::Execute_ShowCanInteract(BestTarget))
+		{
+			CurrentInteractTarget = BestTarget;
+
+			OnFindInteractActor.Broadcast(CurrentInteractTarget);
+		}
+	}
+}
+
 void UInteractSphereComponent::OnBeginOverlap_Implementation(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (OtherActor->Implements<UInteractInterface>())

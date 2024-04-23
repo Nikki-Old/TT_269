@@ -61,6 +61,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "PickUp")
 	USceneComponent* SceneComponent = nullptr;
 
+	/** Data asset for this actor with name and type */
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "PickUp", meta = (ExposeOnSpawn = true))
 	UItemDataAsset* ItemDataAsset = nullptr;
 

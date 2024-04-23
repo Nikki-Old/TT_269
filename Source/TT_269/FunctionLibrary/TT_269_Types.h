@@ -77,11 +77,9 @@ struct FOtherItemActorInfo : public FInventorySlotInfo
 };
 
 USTRUCT(BlueprintType)
-struct FAmmoActorInfo : public FInventorySlotInfo
+struct FAmmoActorInfo
 {
 	GENERATED_BODY()
-
-	FAmmoActorInfo() { ItemType = EItemType::Ammo_Type; }
 };
 
 // Item type:
@@ -94,45 +92,75 @@ enum class EWeaponSlotType : uint8
 };
 
 USTRUCT(BlueprintType)
+struct FWeaponDamageInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponDamage")
+	float Damage = 0.0f;
+};
+
+USTRUCT(BlueprintType)
+struct FCharacterAnimationInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "CharacterAnimation")
+	UAnimSequence* IdleAnimation = nullptr;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "CharacterAnimation")
+	UAnimSequence* RunAnimation = nullptr;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "CharacterAnimation")
+	UAnimMontage* AttackAnimMontage = nullptr;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "CharacterAnimation")
+	UAnimMontage* ReloadAnimMontage = nullptr;
+};
+
+USTRUCT(BlueprintType)
 struct FWeaponActorInfo : public FInventorySlotInfo
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponActorInfo")
 	FName DisplayName = "";
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponActorInfo")
 	TSubclassOf<AWeaponMain> WeaponClass = nullptr;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponActorInfo")
 	EWeaponSlotType WeaponSlotType;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponActorInfo")
 	TSoftObjectPtr<UStaticMesh> PickUpMesh = nullptr;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponActorInfo")
+	FName AttachSocketName = "";
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponActorInfo | Ammo")
 	FAmmoActorInfo AmmoActorInfo = FAmmoActorInfo();
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponActorInfo | Ammo")
+	int32 MaxAmmo = 0;
+
+	UPROPERTY(BlueprintReadWrite, Category = "WeaponActorInfo | Ammo")
+	int32 CurrentAmmo = 0;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponActorInfo | Animation")
+	FCharacterAnimationInfo CharacterAnimation = FCharacterAnimationInfo();
 
 	FWeaponActorInfo() { ItemType = EItemType::Weapon_Type; };
 
 	virtual bool IsEmpty() const override
 	{
-		if (ItemType == EItemType::None_Type)
-		{
-			return true;
-		}
-
-		if (ItemName.IsNone())
-		{
-			return true;
-		}
 
 		if (DisplayName.IsNone())
 		{
 			return true;
 		}
 
-		return false;
+		return Super::IsEmpty();
 	}
 };
 

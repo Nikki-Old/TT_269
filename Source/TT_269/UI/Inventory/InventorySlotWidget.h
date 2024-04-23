@@ -29,9 +29,9 @@ protected:
 	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, Category = "InventorySlot", meta = (ExposeOnSpawn = true))
 	FInventorySlotInfo InventorySlotInfo;
 
-	UFUNCTION(BlueprintCallable, Category = "InventorySlot")
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "InventorySlot")
 	const UGameInstanceMain* GetGameInstanceMain() const;
 
 	UPROPERTY()
-	UGameInstanceMain* GameInstance;
+	UGameInstanceMain* GameInstanceMain;
 };

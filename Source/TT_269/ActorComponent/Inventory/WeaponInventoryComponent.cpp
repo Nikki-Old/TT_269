@@ -19,7 +19,7 @@ bool UWeaponInventoryComponent::AddItemInfo(const FItemActorInfo& NewItemInfo, i
 
 			if (GetGameInstanceMain()->GetWeaponInfoByName(NewItemInfo.ItemName, NewWeaponInfo))
 			{
-				NewWeaponInfo.AmmoActorInfo.ItemQuantity = Quantity;
+				NewWeaponInfo.CurrentAmmo = Quantity;
 
 				FWeaponActorInfo CurrentWeaponInfo;
 				bool bIsFree = IsHaveFreeSlot(NewWeaponInfo.WeaponSlotType, CurrentWeaponInfo);
@@ -30,6 +30,12 @@ bool UWeaponInventoryComponent::AddItemInfo(const FItemActorInfo& NewItemInfo, i
 				if (!bIsFree)
 				{
 					// TO DO: logic for drop weapon:
+				}
+
+				if (CurrentWeaponInfoSlot == EWeaponSlotType::None_Type)
+				{
+					FWeaponActorInfo WeaponInfo;
+					SetCurrentWeaponInfoBySlotType(NewWeaponInfo.WeaponSlotType, WeaponInfo);
 				}
 
 				return true;
@@ -55,6 +61,25 @@ bool UWeaponInventoryComponent::IsHaveFreeSlot(EWeaponSlotType TargetType, FWeap
 		else
 		{
 			TargetInfo = WeaponsInfo[TargetType];
+		}
+	}
+
+	return false;
+}
+
+bool UWeaponInventoryComponent::SetCurrentWeaponInfoBySlotType(EWeaponSlotType TargetSlotType, FWeaponActorInfo& CurrentWeaponInfo)
+{
+	if (CurrentWeaponInfoSlot != TargetSlotType)
+	{
+		if (WeaponsInfo.Contains(TargetSlotType) && !WeaponsInfo[TargetSlotType].IsEmpty()) 
+		{
+			CurrentWeaponInfoSlot = TargetSlotType;
+
+			CurrentWeaponInfo = WeaponsInfo[TargetSlotType];
+
+			OnUpdateCurrentWeaponSlot.Broadcast(TargetSlotType, CurrentWeaponInfo);
+
+			return true;
 		}
 	}
 

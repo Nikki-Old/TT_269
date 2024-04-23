@@ -12,9 +12,9 @@ void UInventorySlotWidget::UpdateInventorySlot_Implementation(const FInventorySl
 
 void UInventorySlotWidget::NativeConstruct()
 {
-	if (!GameInstance)
+	if (!GameInstanceMain)
 	{
-		GameInstance = UFrameworkLibrary::GetGameInstanceMain(GetWorld());
+		GameInstanceMain = UFrameworkLibrary::GetGameInstanceMain(GetWorld());
 	}
 
 	Super::NativeConstruct();
@@ -22,5 +22,5 @@ void UInventorySlotWidget::NativeConstruct()
 
 const UGameInstanceMain* UInventorySlotWidget::GetGameInstanceMain() const
 {
-	return GameInstance;
+	return GameInstanceMain;
 }
