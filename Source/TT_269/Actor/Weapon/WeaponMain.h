@@ -10,6 +10,11 @@
 class UGameInstanceMain;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWeaponIsInitialized);
+// delegate to call in Character for Play fire Animation:
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponFireStart, UAnimMontage*, AnimFireChar);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnNeededReload);
+
 
 UCLASS()
 class TT_269_API AWeaponMain : public AActor
@@ -27,8 +32,23 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "WeaponMain")
 	FOnWeaponIsInitialized OnWeaponIsInitialized;
 
+	UPROPERTY(BlueprintAssignable, Category = "WeaponMain")
+	FOnWeaponFireStart OnWeaponFireStart;
+
+	/** Call if ammo == 0 */
+	UPROPERTY(BlueprintAssignable, Category = "WeaponMain")
+	FOnNeededReload OnNeededReload;
+
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "WeaponMain")
 	void GetWeaponActorInfo(FWeaponActorInfo& OutInfo) const { OutInfo = WeaponActorInfo; }
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "WeaponMain")
+	void Attack();
+	void Attack_Implementation();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "WeaponMain")
+	void StopAttack();
+	void StopAttack_Implementation();
 
 protected:
 	// Called when the game starts or when spawned
@@ -38,6 +58,7 @@ protected:
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "WeaponMain", meta = (ExposeOnSpawn = true))
 	FName WeaponName = "";
 
+	/** Main information for this weapon */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WeaponMain")
 	FWeaponActorInfo WeaponActorInfo = FWeaponActorInfo();
 
@@ -47,6 +68,27 @@ protected:
 	static UGameInstanceMain* GameInstanceMain;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, Category = "WeaponMain | Fire")
+	void StartFire();
+	void StartFire_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, Category = "WeaponMain | Fire")
+	void Fire();
+	void Fire_Implementation();
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WeaponMain | Fire")
+	FName MuzzleFlashSocketName = "MuzzleFlash";
+
+	UFUNCTION(BlueprintCallable, Category = "WeaponMain")
+	void SetMuzzleFlashRelativeTransform(FTransform NewTransform) { MuzzleFlashRelativeTransform = NewTransform; }
+
+	FTransform MuzzleFlashRelativeTransform = FTransform();
+
+private:
+	UPROPERTY()
+	FTimerHandle FireTimer;
 
 public:
 	// Called every frame

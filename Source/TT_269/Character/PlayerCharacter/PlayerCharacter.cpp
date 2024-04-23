@@ -6,7 +6,10 @@
 #include "Components/ArrowComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
+#include "Controller/PlayerController/PlayerControllerMain.h"
+#include "FunctionLibrary/FrameworkLibrary.h"
 #include "ActorComponent/InteractSphere/InteractSphereComponent.h"
 
 // Sets default values
@@ -37,6 +40,26 @@ APlayerCharacter::APlayerCharacter()
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	//// Save offset:
+	//RotationOffset = GetMesh()->GetRelativeRotation();
+
+}
+
+void APlayerCharacter::PossessedBy(AController* NewController)
+{
+	if (NewController)
+	{
+		PlayerController = Cast<APlayerControllerMain>(NewController);
+		
+		if (!PlayerController)
+		{
+			return;
+		}
+
+		PlayerController->bShowMouseCursor = true;
+	}
+	Super::PossessedBy(NewController);
 }
 
 void APlayerCharacter::MoveToForward(float Axis)
@@ -51,10 +74,30 @@ void APlayerCharacter::MoveToRight(float Axis)
 	this->AddMovementInput((MainCamera->GetRightVector() * Axis));
 }
 
+void APlayerCharacter::UpdateMeshRotationByCursorHit()
+{
+	auto TargetRotationOffset = UKismetMathLibrary::FindLookAtRotation(GetMesh()->GetComponentLocation(), UnderCursorHitResult.Location);
+	TargetRotationOffset.Pitch = 0;
+	TargetRotationOffset.Roll = 0;
+	/*GetMesh()->SetWorldRotation(TargetRotationOffset + RotationOffset);*/
+	this->SetActorRotation(TargetRotationOffset);
+}
+
+void APlayerCharacter::UpdateUnderCursorHitResult()
+{
+	if (PlayerController)
+	{
+		PlayerController->GetHitResultUnderCursorByChannel(TraceTypeQuery1, false, UnderCursorHitResult);
+	}
+}
+
 // Called every frame
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	UpdateUnderCursorHitResult();
+	UpdateMeshRotationByCursorHit();
 }
 
 // Called to bind functionality to input

@@ -8,6 +8,7 @@
 #include "TT_269_Types.generated.h"
 
 class AWeaponMain;
+class AWeaponProjectileMain;
 
 /**
  *
@@ -92,12 +93,39 @@ enum class EWeaponSlotType : uint8
 };
 
 USTRUCT(BlueprintType)
+struct FProjectileInfo
+{
+	GENERATED_BODY();
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "ProjectileInfo")
+	TSubclassOf<AWeaponProjectileMain> Class = nullptr;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "ProjectileInfo")
+	float Damage = 0.0f;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "ProjectileInfo")
+	float InitialSpeed = 0.0f;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "ProjectileInfo")
+	float LifeTime = 0.0f;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "ProjectileInfo")
+	UStaticMesh* Mesh = nullptr;
+};
+
+USTRUCT(BlueprintType)
 struct FWeaponDamageInfo
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponDamage")
-	float Damage = 0.0f;
+	bool bIsAutoFire = true;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponDamage")
+	float RateOfFire = 0.0f;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponDamage")
+	FProjectileInfo ProjectileInfo = FProjectileInfo();
 };
 
 USTRUCT(BlueprintType)
@@ -149,6 +177,9 @@ struct FWeaponActorInfo : public FInventorySlotInfo
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponActorInfo | Animation")
 	FCharacterAnimationInfo CharacterAnimation = FCharacterAnimationInfo();
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponActorInfo | Animation")
+	FWeaponDamageInfo WeaponDamageInfo = FWeaponDamageInfo();
 
 	FWeaponActorInfo() { ItemType = EItemType::Weapon_Type; };
 

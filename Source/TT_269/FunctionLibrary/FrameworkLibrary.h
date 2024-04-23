@@ -7,6 +7,7 @@
 #include "FrameworkLibrary.generated.h"
 
 class UGameInstanceMain;
+class APlayerControllerMain;
 
 /**
  *
@@ -20,4 +21,7 @@ class TT_269_API UFrameworkLibrary : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Framework", meta = (WorldContext = "World"))
 	static UGameInstanceMain* GetGameInstanceMain(const UObject* World);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Framework")
+	static APlayerControllerMain* GetPlayerControllerMain(const APawn* PlayerPawn);
 };

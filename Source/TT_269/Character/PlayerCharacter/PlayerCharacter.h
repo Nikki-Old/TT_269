@@ -11,6 +11,7 @@ class UCameraComponent;
 class UArrowComponent;
 class USphereComponent;
 class UInteractSphereComponent;
+class APlayerControllerMain;
 
 UCLASS()
 class TT_269_API APlayerCharacter : public ACharacter
@@ -21,9 +22,20 @@ public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
 
+	/** Get controller this pawn */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "PlayerCharacter")
+	APlayerControllerMain* GetPlayerControllerMain() const { return PlayerController; }
+
+	/** Get hit result under cursor */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "PlayerCharacter")
+	void GetUnderCursorHitResult(FHitResult& OutInfo) const { OutInfo = UnderCursorHitResult; }
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	/** Override method */
+	virtual void PossessedBy(AController* NewController) override;
 
 	// Camera:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "PlayerCharacter | Camera")
@@ -45,11 +57,25 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "PlayerCharacter | Movement")
 	void MoveToRight(float Axis);
 
-public:	
+	UFUNCTION()
+	void UpdateMeshRotationByCursorHit();
+
+	UFUNCTION()
+	void UpdateUnderCursorHitResult();
+
+protected:
+	/** Controller this pawn **/
+	UPROPERTY(BlueprintReadWrite, Category = "PlayerCharacter")
+	APlayerControllerMain* PlayerController = nullptr;
+
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+private:
+	FHitResult UnderCursorHitResult = FHitResult();
+	//FRotator RotationOffset = FRotator(0);
 };
