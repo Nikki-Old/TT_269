@@ -22,6 +22,9 @@ public:
 	bool GetInventoryInfoByItemInfo(const FItemActorInfo& ItemActorInfo, FInventorySlotInfo& OutInfo);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "GameInstanceMain")
+	bool GetAmmoInfoByName(const FName& TargetName, FAmmoActorInfo& OutInfo);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "GameInstanceMain")
 	bool GetWeaponInfoByName(const FName& TargetName, FWeaponActorInfo& OutInfo);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "GameInstanceMain")

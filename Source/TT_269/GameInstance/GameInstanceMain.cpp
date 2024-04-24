@@ -25,6 +25,23 @@ bool UGameInstanceMain::GetInventoryInfoByItemInfo(const FItemActorInfo& ItemAct
 	return false;
 }
 
+bool UGameInstanceMain::GetAmmoInfoByName(const FName& TargetName, FAmmoActorInfo& OutInfo)
+{
+	const auto TargetTable = Tables[EItemType::Ammo_Type];
+
+	if (TargetTable)
+	{
+		FAmmoActorInfo* NeededInfo = TargetTable->FindRow<FAmmoActorInfo>(TargetName, "", false);
+		if (NeededInfo)
+		{
+			OutInfo = *NeededInfo;
+			return true;
+		}
+	}
+
+	return false;
+}
+
 bool UGameInstanceMain::GetWeaponInfoByName(const FName& TargetName, FWeaponActorInfo& OutInfo)
 {
 	const auto TargetTable = Tables[EItemType::Weapon_Type];

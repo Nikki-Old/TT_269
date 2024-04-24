@@ -76,6 +76,30 @@ int32 UInventoryComponent::IsHaveItemByName(const FName& TargetName, FInventoryS
 	return -1;
 }
 
+int32 UInventoryComponent::GetItemInventoryInfo(const FItemActorInfo& TargetItemInfo, FInventorySlotInfo& OutInfo)
+{
+	for (int32 i = 0; i < InventoryInfo.Num(); i++)
+	{
+		if (InventoryInfo[i].ItemType == TargetItemInfo.ItemType && InventoryInfo[i].ItemName == TargetItemInfo.ItemName)
+		{
+			OutInfo = InventoryInfo[i];
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+void UInventoryComponent::ChangeInventorySlot(const int32 Index, const FInventorySlotInfo& NewInventorySlotInfo)
+{
+	if (InventoryInfo.IsValidIndex(Index))
+	{
+		InventoryInfo[Index] = NewInventorySlotInfo;
+		
+		OnUpdateInventorySlot.Broadcast(Index, NewInventorySlotInfo);
+	}
+}
+
 // Called when the game starts
 void UInventoryComponent::BeginPlay()
 {

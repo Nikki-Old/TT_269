@@ -32,6 +32,12 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Inventory")
 	int32 IsHaveItemByName(const FName& TargetName, FInventorySlotInfo& OutInventroySlot) const;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Inventory")
+	int32 GetItemInventoryInfo(const FItemActorInfo& TargetItemInfo, FInventorySlotInfo& OutInfo);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void ChangeInventorySlot(const int32 Index, const FInventorySlotInfo& NewInventorySlotInfo);
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

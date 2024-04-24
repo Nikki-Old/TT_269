@@ -2,6 +2,7 @@
 
 #include "WeaponMain.h"
 #include "FunctionLibrary/FrameworkLibrary.h"
+#include "Components/SkeletalMeshComponent.h"
 
 #include "GameInstance/GameInstanceMain.h"
 #include "Actor/Projectile/WeaponProjectileMain.h"
@@ -13,6 +14,14 @@ AWeaponMain::AWeaponMain()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	// Create "root":
+	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Scene"));
+	this->SetRootComponent(SceneComponent);
+
+	// Create skeletal mesh for weapon:
+	WeaponSK = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponSK"));
+	WeaponSK->SetupAttachment(GetRootComponent());
 }
 
 void AWeaponMain::Attack_Implementation()
@@ -43,6 +52,11 @@ void AWeaponMain::StopAttack_Implementation()
 	}
 }
 
+void AWeaponMain::AddAmmoQuantity(const int32 NewQuantity)
+{
+	OnChangeAmmo.Broadcast(WeaponActorInfo.CurrentAmmo += NewQuantity);
+}
+
 // Called when the game starts or when spawned
 void AWeaponMain::BeginPlay()
 {
@@ -58,12 +72,22 @@ void AWeaponMain::BeginPlay()
 
 void AWeaponMain::InitializeWeapon()
 {
-	if (GameInstanceMain)
+	//// Set muzzle offset:
+	// MuzzleFlashOffset = WeaponSK->GetSocketTransform(MuzzleFlashSocketName, ERelativeTransformSpace::RTS_ParentBoneSpace);
+
+	if (WeaponActorInfo.IsEmpty())
 	{
-		if (GameInstanceMain->GetWeaponInfoByName(WeaponName, WeaponActorInfo))
+		if (GameInstanceMain)
 		{
-			OnWeaponIsInitialized.Broadcast();
+			if (GameInstanceMain->GetWeaponInfoByName(WeaponName, WeaponActorInfo))
+			{
+				OnWeaponIsInitialized.Broadcast();
+			}
 		}
+	}
+	else
+	{
+		OnWeaponIsInitialized.Broadcast();
 	}
 }
 
@@ -86,6 +110,9 @@ void AWeaponMain::StartFire_Implementation()
 {
 	if (!FireTimer.IsValid())
 	{
+		// First shoot:
+		Fire();
+
 		// Set timer how can often fire.
 		GetWorld()->GetTimerManager().SetTimer(FireTimer, this, &AWeaponMain::Fire, WeaponActorInfo.WeaponDamageInfo.RateOfFire, true);
 	}
@@ -97,30 +124,38 @@ void AWeaponMain::Fire_Implementation()
 	if (!GetOwner())
 		return;
 
-	if (IsValid(WeaponActorInfo.WeaponDamageInfo.ProjectileInfo.Class))
+	if (WeaponActorInfo.CurrentAmmo > 0)
 	{
-		OnWeaponFireStart.Broadcast(WeaponActorInfo.CharacterAnimation.AttackAnimMontage);
-
-		//// FX start:
-		///*Set sound Weapon.*/
-		// if (WeaponSetting.SoundFireWeapon)
-		//	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), WeaponSetting.SoundFireWeapon, ShootLocation->GetComponentLocation());
-
-		FTransform SpawnTransform = MuzzleFlashRelativeTransform;
-		SpawnTransform.SetLocation(SpawnTransform.GetLocation() + this->GetActorLocation());
-		SpawnTransform.SetRotation(FQuat(SpawnTransform.GetRotation().Rotator() + this->GetActorRotation()));
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.Owner = this;
-		SpawnParams.Instigator = GetInstigator();
-
-		AWeaponProjectileMain* Projectile = GetWorld()->SpawnActorDeferred<AWeaponProjectileMain>(WeaponActorInfo.WeaponDamageInfo.ProjectileInfo.Class, SpawnTransform, this);
-		if (Projectile)
+		if (IsValid(WeaponActorInfo.WeaponDamageInfo.ProjectileInfo.Class))
 		{
-			Projectile->InitProjectile(WeaponActorInfo.WeaponDamageInfo.ProjectileInfo);
-			Projectile->SetInstigator(GetInstigator());
-			Projectile->FinishSpawning(SpawnTransform);
+			OnChangeAmmo.Broadcast(--WeaponActorInfo.CurrentAmmo);
+			OnWeaponFireStart.Broadcast(WeaponActorInfo.CharacterAnimation.AttackAnimMontage);
+
+			//// FX start:
+			///*Set sound Weapon.*/
+			// if (WeaponSetting.SoundFireWeapon)
+			//	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), WeaponSetting.SoundFireWeapon, ShootLocation->GetComponentLocation());
+
+			FActorSpawnParameters SpawnParams;
+			SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			SpawnParams.Owner = this;
+			SpawnParams.Instigator = GetInstigator();
+
+			FTransform SpawnTransform = WeaponSK->GetSocketTransform(MuzzleFlashSocketName);
+			/*SpawnTransform.SetLocation();
+			SpawnTransform.SetRotation(FMatrix(WeaponSK->GetForwardVector(), FVector(0, 1, 0), FVector(0, 0, 1), FVector::ZeroVector).ToQuat());*/
+
+			AWeaponProjectileMain* Projectile = GetWorld()->SpawnActorDeferred<AWeaponProjectileMain>(WeaponActorInfo.WeaponDamageInfo.ProjectileInfo.Class, SpawnTransform, this);
+			if (Projectile)
+			{
+				Projectile->InitProjectile(WeaponActorInfo.WeaponDamageInfo.ProjectileInfo);
+				Projectile->SetInstigator(GetInstigator());
+				Projectile->FinishSpawning(SpawnTransform);
+			}
 		}
+	}
+	else
+	{
+		AWeaponMain::StopAttack();
 	}
 }

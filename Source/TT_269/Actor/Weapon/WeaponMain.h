@@ -10,11 +10,13 @@
 class UGameInstanceMain;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWeaponIsInitialized);
+
 // delegate to call in Character for Play fire Animation:
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWeaponFireStart, UAnimMontage*, AnimFireChar);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnNeededReload);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeAmmo, int32, NewAmmoQuatity);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnNeededReload);
 
 UCLASS()
 class TT_269_API AWeaponMain : public AActor
@@ -25,12 +27,12 @@ public:
 	// Sets default values for this actor's properties
 	AWeaponMain();
 
-	/** Load info and set information */
-	virtual void InitializeWeapon();
-
 	/** Delegate for check is initialized */
 	UPROPERTY(BlueprintAssignable, Category = "WeaponMain")
 	FOnWeaponIsInitialized OnWeaponIsInitialized;
+
+	UPROPERTY(BlueprintAssignable, Category = "WeaponMain")
+	FOnChangeAmmo OnChangeAmmo;
 
 	UPROPERTY(BlueprintAssignable, Category = "WeaponMain")
 	FOnWeaponFireStart OnWeaponFireStart;
@@ -50,16 +52,36 @@ public:
 	void StopAttack();
 	void StopAttack_Implementation();
 
+	UFUNCTION(BlueprintCallable, Category = "WeaponMain")
+	void AddAmmoQuantity(const int32 NewQuantity);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "WeaponMain")
+	int32 GetCurrentAmmoQuantity() const { return WeaponActorInfo.CurrentAmmo; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "WeaponMain")
+	int32 GetMaxAmmoQuantity() const { return WeaponActorInfo.MaxAmmo; }
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	/** Load info and set information */
+	virtual void InitializeWeapon();
+
+	/** Root component */
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponMain")
+	USceneComponent* SceneComponent = nullptr;
+
+	/** Weapon Skeletal Mesh */
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponMain")
+	USkeletalMeshComponent* WeaponSK = nullptr;
 
 	/** Find information by this name in Table */
 	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "WeaponMain", meta = (ExposeOnSpawn = true))
 	FName WeaponName = "";
 
 	/** Main information for this weapon */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WeaponMain")
+	UPROPERTY(EditAnyWhere, BlueprintReadOnly, Category = "WeaponMain", meta = (ExposeOnSpawn = true))
 	FWeaponActorInfo WeaponActorInfo = FWeaponActorInfo();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "InventorySlot")
@@ -81,10 +103,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WeaponMain | Fire")
 	FName MuzzleFlashSocketName = "MuzzleFlash";
 
-	UFUNCTION(BlueprintCallable, Category = "WeaponMain")
-	void SetMuzzleFlashRelativeTransform(FTransform NewTransform) { MuzzleFlashRelativeTransform = NewTransform; }
+	// UFUNCTION(BlueprintCallable, Category = "WeaponMain")
+	// void SetMuzzleFlashRelativeTransform(FTransform NewTransform) { MuzzleFlashRelativeTransform = NewTransform; }
 
-	FTransform MuzzleFlashRelativeTransform = FTransform();
+	/*FTransform MuzzleFlashOffset = FTransform();*/
 
 private:
 	UPROPERTY()

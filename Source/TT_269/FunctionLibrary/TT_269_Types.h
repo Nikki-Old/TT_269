@@ -73,14 +73,9 @@ struct FOtherItemActorInfo : public FInventorySlotInfo
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
 	FName DisplayName = "";
+
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
 	UStaticMesh* Mesh = nullptr;
-};
-
-USTRUCT(BlueprintType)
-struct FAmmoActorInfo
-{
-	GENERATED_BODY()
 };
 
 // Item type:
@@ -147,6 +142,20 @@ struct FCharacterAnimationInfo
 };
 
 USTRUCT(BlueprintType)
+struct FAmmoActorInfo : public FInventorySlotInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "AmmoActorInfo")
+	FName DisplayName = "";
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "AmmoActorInfo")
+	UStaticMesh* Mesh = nullptr;
+
+	FAmmoActorInfo() { ItemType = EItemType::Ammo_Type; }
+};
+
+USTRUCT(BlueprintType)
 struct FWeaponActorInfo : public FInventorySlotInfo
 {
 	GENERATED_BODY()
@@ -165,9 +174,6 @@ struct FWeaponActorInfo : public FInventorySlotInfo
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponActorInfo")
 	FName AttachSocketName = "";
-
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponActorInfo | Ammo")
-	FAmmoActorInfo AmmoActorInfo = FAmmoActorInfo();
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponActorInfo | Ammo")
 	int32 MaxAmmo = 0;
