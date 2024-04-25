@@ -79,6 +79,8 @@ struct FOtherItemActorInfo : public FInventorySlotInfo
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
 	UStaticMesh* Mesh = nullptr;
+
+	FOtherItemActorInfo() { ItemType = EItemType::Other_Type; }
 };
 
 /** Projectile info */
