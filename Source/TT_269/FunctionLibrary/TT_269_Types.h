@@ -25,6 +25,7 @@ enum class EItemType : uint8
 	MAX_Type UMETA(DisplayName = "MAX")
 };
 
+/** Item actor info */
 USTRUCT(BlueprintType)
 struct FItemActorInfo : public FTableRowBase
 {
@@ -54,6 +55,7 @@ struct FItemActorInfo : public FTableRowBase
 	}
 };
 
+/** Inventory slot, child struct "FItemActorInfo" */
 USTRUCT(BlueprintType)
 struct FInventorySlotInfo : public FItemActorInfo
 {
@@ -66,6 +68,7 @@ struct FInventorySlotInfo : public FItemActorInfo
 	int32 MaxItemQuantity = 1;
 };
 
+/** Other item actor info, child struct "FInventorySlotInfo" */
 USTRUCT(BlueprintType)
 struct FOtherItemActorInfo : public FInventorySlotInfo
 {
@@ -78,15 +81,7 @@ struct FOtherItemActorInfo : public FInventorySlotInfo
 	UStaticMesh* Mesh = nullptr;
 };
 
-// Item type:
-UENUM(BlueprintType)
-enum class EWeaponSlotType : uint8
-{
-	None_Type UMETA(DisplayName = "None"),
-	First_Type UMETA(DisplayName = "First"),
-	Second_Type UMETA(DisplayName = "Second")
-};
-
+/** Projectile info */
 USTRUCT(BlueprintType)
 struct FProjectileInfo
 {
@@ -108,21 +103,7 @@ struct FProjectileInfo
 	UStaticMesh* Mesh = nullptr;
 };
 
-USTRUCT(BlueprintType)
-struct FWeaponDamageInfo
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponDamage")
-	bool bIsAutoFire = true;
-
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponDamage")
-	float RateOfFire = 0.0f;
-
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponDamage")
-	FProjectileInfo ProjectileInfo = FProjectileInfo();
-};
-
+/** Weapon character animation info */
 USTRUCT(BlueprintType)
 struct FCharacterAnimationInfo
 {
@@ -141,6 +122,7 @@ struct FCharacterAnimationInfo
 	UAnimMontage* ReloadAnimMontage = nullptr;
 };
 
+/** Ammo actor info: */
 USTRUCT(BlueprintType)
 struct FAmmoActorInfo : public FInventorySlotInfo
 {
@@ -155,6 +137,32 @@ struct FAmmoActorInfo : public FInventorySlotInfo
 	FAmmoActorInfo() { ItemType = EItemType::Ammo_Type; }
 };
 
+/** Weapon slot type */
+UENUM(BlueprintType)
+enum class EWeaponSlotType : uint8
+{
+	None_Type UMETA(DisplayName = "None"),
+	First_Type UMETA(DisplayName = "First"),
+	Second_Type UMETA(DisplayName = "Second")
+};
+
+/** Weapon damage info*/
+USTRUCT(BlueprintType)
+struct FWeaponDamageInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponDamage")
+	bool bIsAutoFire = true;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponDamage")
+	float RateOfFire = 0.0f;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponDamage")
+	FProjectileInfo ProjectileInfo = FProjectileInfo();
+};
+
+/** Weapon info */
 USTRUCT(BlueprintType)
 struct FWeaponActorInfo : public FInventorySlotInfo
 {

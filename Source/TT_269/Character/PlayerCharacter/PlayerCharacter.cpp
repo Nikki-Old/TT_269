@@ -79,7 +79,6 @@ void APlayerCharacter::UpdateMeshRotationByCursorHit()
 	auto TargetRotationOffset = UKismetMathLibrary::FindLookAtRotation(GetMesh()->GetComponentLocation(), UnderCursorHitResult.Location);
 	TargetRotationOffset.Pitch = 0;
 	TargetRotationOffset.Roll = 0;
-	/*GetMesh()->SetWorldRotation(TargetRotationOffset + RotationOffset);*/
 	this->SetActorRotation(TargetRotationOffset);
 }
 

@@ -6,9 +6,10 @@ bool UGameInstanceMain::GetInventoryInfoByItemInfo(const FItemActorInfo& ItemAct
 {
 	if (!ItemActorInfo.IsEmpty())
 	{
-		if (Tables.Contains(ItemActorInfo.ItemType))
+		if (ItemTables.Contains(ItemActorInfo.ItemType))
 		{
-			const auto TargetTable = Tables[ItemActorInfo.ItemType];
+			// Get target table by item type:
+			const auto TargetTable = ItemTables[ItemActorInfo.ItemType];
 
 			if (TargetTable)
 			{
@@ -17,6 +18,10 @@ bool UGameInstanceMain::GetInventoryInfoByItemInfo(const FItemActorInfo& ItemAct
 				{
 					OutInfo = *NeededInfo;
 					return true;
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Not find item by name: %s"), ItemActorInfo.ItemName);
 				}
 			}
 		}
@@ -27,7 +32,9 @@ bool UGameInstanceMain::GetInventoryInfoByItemInfo(const FItemActorInfo& ItemAct
 
 bool UGameInstanceMain::GetAmmoInfoByName(const FName& TargetName, FAmmoActorInfo& OutInfo)
 {
-	const auto TargetTable = Tables[EItemType::Ammo_Type];
+	// Get target table by item type:
+	const auto TargetTable = ItemTables[EItemType::Ammo_Type];
+	check(TargetTable);
 
 	if (TargetTable)
 	{
@@ -37,6 +44,10 @@ bool UGameInstanceMain::GetAmmoInfoByName(const FName& TargetName, FAmmoActorInf
 			OutInfo = *NeededInfo;
 			return true;
 		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Not find item by name: %s"), TargetName);
+		}
 	}
 
 	return false;
@@ -44,8 +55,10 @@ bool UGameInstanceMain::GetAmmoInfoByName(const FName& TargetName, FAmmoActorInf
 
 bool UGameInstanceMain::GetWeaponInfoByName(const FName& TargetName, FWeaponActorInfo& OutInfo)
 {
-	const auto TargetTable = Tables[EItemType::Weapon_Type];
+	// Get target table by item type:
+	const auto TargetTable = ItemTables[EItemType::Weapon_Type];
 
+	check(TargetTable);
 	if (TargetTable)
 	{
 		FWeaponActorInfo* NeededInfo = TargetTable->FindRow<FWeaponActorInfo>(TargetName, "", false);
@@ -54,14 +67,20 @@ bool UGameInstanceMain::GetWeaponInfoByName(const FName& TargetName, FWeaponActo
 			OutInfo = *NeededInfo;
 			return true;
 		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Not find item by name: %s"), TargetName);
+		}
 	}
+
 
 	return false;
 }
 
 bool UGameInstanceMain::GetOtherActorInfoByName(const FName& TargetName, FOtherItemActorInfo& OutInfo)
 {
-	const auto TargetTable = Tables[EItemType::Other_Type];
+	const auto TargetTable = ItemTables[EItemType::Other_Type];
+	check(TargetTable);
 
 	if (TargetTable)
 	{
@@ -70,6 +89,10 @@ bool UGameInstanceMain::GetOtherActorInfoByName(const FName& TargetName, FOtherI
 		{
 			OutInfo = *NeededInfo;
 			return true;
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Not find item by name: %s"), TargetName);
 		}
 	}
 

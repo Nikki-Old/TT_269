@@ -18,19 +18,24 @@ class TT_269_API UGameInstanceMain : public UGameInstance
 	GENERATED_BODY()
 
 public:
+	/** Get inventory info */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "GameInstanceMain")
 	bool GetInventoryInfoByItemInfo(const FItemActorInfo& ItemActorInfo, FInventorySlotInfo& OutInfo);
 
+	/** Get Ammo info */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "GameInstanceMain")
 	bool GetAmmoInfoByName(const FName& TargetName, FAmmoActorInfo& OutInfo);
 
+	/** Get Weapon Info */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "GameInstanceMain")
 	bool GetWeaponInfoByName(const FName& TargetName, FWeaponActorInfo& OutInfo);
 
+	/** Get Other actor info */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "GameInstanceMain")
 	bool GetOtherActorInfoByName(const FName& TargetName, FOtherItemActorInfo& OutInfo);
 
 protected:
+	/** Tables for items */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GameInstanceMain")
-	TMap<EItemType, UDataTable*> Tables = {};
+	TMap<EItemType, UDataTable*> ItemTables = {};
 };
