@@ -41,6 +41,16 @@ void ATurretMain::StartShootAtLocation(FVector TargetLocation)
 	}
 }
 
+void ATurretMain::StartShootToTarget(AActor* NewTarget)
+{
+	ShootTarget = NewTarget;
+
+	if (ShootTarget)
+	{
+		StartShootAtLocation(ShootTarget->GetActorLocation());
+	}
+}
+
 void ATurretMain::SetCanRotate(bool bIsCan)
 {
 	bIsCanRotate = bIsCan;
@@ -103,7 +113,6 @@ void ATurretMain::UpdateLookAtRotation()
 		TurnYawMesh->SetWorldRotation(FMath::RInterpTo(CurrentYawMeshRotation, TargetYawMeshRotation, TurretInfo.HowOftenUpdateRotation, TurretInfo.UpdateRotateSpeed));
 		bIsCanFire = false;
 	}
-	
 
 	if (bIsCanFire)
 	{
@@ -131,7 +140,7 @@ void ATurretMain::Fire_Implementation()
 			Projectile->SetInstigator(GetInstigator());
 			Projectile->FinishSpawning(SpawnTransform);
 		}
-
+		
 		// TO DO: Add sound and FX
 
 		if (IsTurnToTarget())
@@ -142,6 +151,11 @@ void ATurretMain::Fire_Implementation()
 		else
 		{
 			SetCanRotate(true);
+		}
+
+		if (ShootTarget)
+		{
+			StartShootAtLocation(ShootTarget->GetActorLocation());
 		}
 	}
 }

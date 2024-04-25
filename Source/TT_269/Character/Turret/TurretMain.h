@@ -58,10 +58,15 @@ public:
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "TurretMain")
 	UArrowComponent* ShootDirection = nullptr;
 
-	/** Start rotate to location and 
+	/** Start rotate to location and
 	if current shoot direction == target location - shoot. */
 	UFUNCTION(BlueprintCallable, Category = "TurretMain")
 	void StartShootAtLocation(FVector TargetLocation);
+
+	/** Start rotate to target location and
+	if current shoot direction == target location - shoot. */
+	UFUNCTION(BlueprintCallable, Category = "TurretMain")
+	void StartShootToTarget(AActor* NewTarget);
 
 	/** Set can rotate */
 	UFUNCTION(BlueprintCallable, Category = "TurretMain")
@@ -83,6 +88,9 @@ protected:
 	FTurretInfo TurretInfo;
 
 private:
+	UPROPERTY()
+	AActor* ShootTarget = nullptr;
+
 	FVector TargetShootLocation = FVector(0);
 	FRotator TargetRotate = FRotator(0);
 
