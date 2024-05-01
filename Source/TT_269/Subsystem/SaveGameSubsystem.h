@@ -6,11 +6,14 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "SaveGameSubsystem.generated.h"
 
+class USaveGameMain;
+
 /**
  *
  */
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartSave);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeSaveGameObject, USaveGameMain*, NewSaveGameObject);
 
 UCLASS()
 class TT_269_API USaveGameSubsystem : public UGameInstanceSubsystem
@@ -26,14 +29,14 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "SaveGameSubsystem")
 	FOnStartSave OnStartSave;
 
+	UPROPERTY(BlueprintAssignable, Category = "SaveGameSubsystem")
+	FOnChangeSaveGameObject OnChangeSaveGameObject;
+
 	UFUNCTION(BlueprintCallable, Category = "SaveGameSubsystem")
 	void CallStartSave();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SaveGameSubsystem")
 	TArray<FString> GetAllSaveGames();
-
-	// UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SaveGameSubsystem")
-	// bool GetSaveGamesByTarget(FString TargetName, TArray<FString>& OutInfo);
 
 	UFUNCTION(BlueprintCallable, Category = "SaveGameSubsystem")
 	bool CreateNewSaveGame(const FString SlotName, TSubclassOf<USaveGame> SaveGameClass, USaveGame*& SaveGameObject);
@@ -48,55 +51,23 @@ public:
 	bool DeleteSaveGameSlot(const FString SlotName);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SaveGameSubsystem")
-	USaveGame* GetCurrentSaveGameObject() const;
-
-	UFUNCTION(BlueprintCallable, Category = "SaveGameSubsystem")
-	void DeleteAllSaveGameSlots();
-	UFUNCTION(BlueprintCallable, Category = "SaveGameSubsystem")
-	void SetCurrentSaveGameObject(const FString SlotName, USaveGame* SaveGameObject);
+	USaveGameMain* GetCurrentSaveGameObject() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SaveGameSubsystem")
 	FString GetCurrentSaveGameSlot() const { return CurrentSaveGameSlot; }
 
 	UFUNCTION(BlueprintCallable, Category = "SaveGameSubsystem")
-	bool LoadSaveSettingsData(USaveGame*& SaveGameObject);
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SaveGameSubsystem")
-	USaveGame* GetSaveSettingsData() const { return SaveSettingsObject; }
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SaveGameSubsystem")
-	void GetSaveSettingsDataName(FString& OutInfo) const { OutInfo = SaveSettingsDataName; }
+	void DeleteAllSaveGameSlots();
 
 	UFUNCTION(BlueprintCallable, Category = "SaveGameSubsystem")
-	bool LoadSaveCollectiblesData(USaveGame*& SaveGameObject);
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SaveGameSubsystem")
-	void GetSaveCollectibleDataName(FString& OutInfo) const { OutInfo = SaveCollectiblesDataName; }
-
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SaveGameSubsystem")
-	USaveGame* GetSaveCollectiblesData() const { return SaveCollectiblesObject; }
+	void SetCurrentSaveGameObject(const FString SlotName, USaveGame* SaveGameObject);
 
 private:
 	UPROPERTY()
-	FString SaveSettingsDataName = "Settings";
-
-	UPROPERTY()
-	USaveGame* SaveSettingsObject = nullptr;
-
-	UPROPERTY()
-	FString SaveCollectiblesDataName = "Collectibles";
-
-	UPROPERTY()
-	USaveGame* SaveCollectiblesObject = nullptr;
-
-	UPROPERTY()
-	USaveGame* CurrentSaveGameObject = nullptr;
+	USaveGameMain* CurrentSaveGameObject = nullptr;
 
 	UPROPERTY()
 	FString CurrentSaveGameSlot = "";
-
-	// UPROPERTY()
-	// TArray<FString> AvaiableSaveGames;
 
 	UPROPERTY()
 	TArray<FString> SaveGameNames;

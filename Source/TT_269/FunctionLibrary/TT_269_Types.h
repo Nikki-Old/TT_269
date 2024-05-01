@@ -14,6 +14,31 @@ class AWeaponProjectileMain;
  *
  */
 
+/**
+*	Use for base actor
+*	If actor on level before game is start.
+*/
+USTRUCT(BlueprintType)
+struct FSaveInfoActor
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "SaveInfo")
+	FTransform Transform = FTransform();
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "SaveInfo")
+	bool bIsDestroyed = false;
+};
+
+USTRUCT(BlueprintType)
+struct FDynamicSaveInfoActor : public FSaveInfoActor
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "SaveInfo")
+	TSubclassOf<AActor> Class = nullptr;
+};
+
 // Item type:
 UENUM(BlueprintType)
 enum class EItemType : uint8
@@ -209,6 +234,21 @@ struct FWeaponActorInfo : public FInventorySlotInfo
 
 		return Super::IsEmpty();
 	}
+};
+
+USTRUCT(BlueprintType)
+struct FPlayerCharacterSaveInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "SaveGame")
+	float Health = 0.0f;
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "SaveGame")
+	TArray<FInventorySlotInfo> InventoryInfo = {};
+
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "SaveGame")
+	TMap<EWeaponSlotType, FWeaponActorInfo> WeaponsInfo = {};
 };
 
 UCLASS()

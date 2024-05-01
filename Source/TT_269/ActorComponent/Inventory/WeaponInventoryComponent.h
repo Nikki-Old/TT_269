@@ -13,6 +13,7 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnUpdateWeaponSlot, EWeaponSlotType, SlotType, FWeaponActorInfo, WeaponActorInfo);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnUpdateCurrentWeaponSlot, EWeaponSlotType, SlotType, FWeaponActorInfo, WeaponActorInfo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoadWeaponInfo);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class TT_269_API UWeaponInventoryComponent : public UInventoryComponent
@@ -28,6 +29,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "WeaponInventory")
 	FOnUpdateCurrentWeaponSlot OnUpdateCurrentWeaponSlot;
 
+	UPROPERTY(BlueprintAssignable, Category = "WeaponInventory")
+	FOnLoadWeaponInfo OnLoadWeaponInfo;
+
 	virtual bool AddItemInfo(const FItemActorInfo& NewItemInfo, int32 Quantity) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "WeaponInventory")
@@ -41,6 +45,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "WeaponInventory")
 	void GetCurrentWeaponInfoSlot(EWeaponSlotType& OutInfo) const { OutInfo = CurrentWeaponInfoSlot; }
+
+	UFUNCTION(BlueprintCallable, Category = "SaveGame")
+	void LoadWeaponsInfo(const TMap<EWeaponSlotType, FWeaponActorInfo>& NewWeaponsInfo);
 
 private:
 	UPROPERTY()

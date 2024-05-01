@@ -5,6 +5,7 @@
 #include "Misc/Paths.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/SaveGame.h"
+#include "SaveGame/SaveGameMain.h"
 
 // Create log for this class:
 DEFINE_LOG_CATEGORY_STATIC(LogSaveGameSubsystem, All, All)
@@ -36,7 +37,6 @@ void USaveGameSubsystem::CallStartSave()
 
 TArray<FString> USaveGameSubsystem::GetAllSaveGames()
 {
-	//AvaiableSaveGames = {};
 
 	if (SaveGameNames.Num() <= 0)
 	{
@@ -52,33 +52,11 @@ TArray<FString> USaveGameSubsystem::GetAllSaveGames()
 			auto FileName = FoundFile.Mid(0, IndexFormat);
 			SaveGameNames.Add(FileName);
 
-			//if (FileName != SaveSettingsDataName && FileName != SaveCollectiblesDataName)
-			//{
-			//	AvaiableSaveGames.Add(FileName);
-			//}
 		}
 	}
 
 	return SaveGameNames;
 }
-
-// bool USaveGameSubsystem::GetSaveGamesByTarget(FString TargetName, TArray<FString>& OutInfo)
-//{
-//	if (SaveGameNames.Num() > 0)
-//	{
-//		for (const auto SaveGameName : SaveGameNames)
-//		{
-//			if (SaveGameName.Find(TargetName) > -1)
-//			{
-//				OutInfo.AddUnique(SaveGameName);
-//			}
-//		}
-//
-//		return true;
-//	}
-//
-//	return false;
-// }
 
 bool USaveGameSubsystem::CreateNewSaveGame(const FString SlotName, TSubclassOf<USaveGame> SaveGameClass, USaveGame*& SaveGameObject)
 {
@@ -87,10 +65,6 @@ bool USaveGameSubsystem::CreateNewSaveGame(const FString SlotName, TSubclassOf<U
 		SaveGameObject = UGameplayStatics::CreateSaveGameObject(SaveGameClass);
 		if (UGameplayStatics::SaveGameToSlot(SaveGameObject, SlotName, 0))
 		{
-			// if (SaveGameNames.Num() >= MaxSaveSlot)
-			//{
-			//	DeleteSaveGameSlot(SaveGameNames[0]);
-			// }
 
 			SaveGameNames.AddUnique(SlotName);
 
@@ -105,19 +79,20 @@ void USaveGameSubsystem::SaveGameObject(const FString SlotName, USaveGame* SaveG
 {
 	if (!SlotName.IsEmpty())
 	{
+		CallStartSave();
 		UGameplayStatics::SaveGameToSlot(SaveGameObject, SlotName, 0);
 	}
 }
 
 bool USaveGameSubsystem::LoadSaveGame(const FString SlotName, USaveGame*& SaveGameObject)
 {
-	SaveGameObject = UGameplayStatics::LoadGameFromSlot(SlotName, 0);	
+	SaveGameObject = UGameplayStatics::LoadGameFromSlot(SlotName, 0);
 	return SaveGameObject ? true : false;
 }
 
 bool USaveGameSubsystem::DeleteSaveGameSlot(const FString SlotName)
 {
-	if (SlotName.IsEmpty() && SlotName != SaveSettingsDataName && SlotName != SaveCollectiblesDataName)
+	if (SlotName.IsEmpty())
 	{
 		return false;
 	}
@@ -130,7 +105,7 @@ bool USaveGameSubsystem::DeleteSaveGameSlot(const FString SlotName)
 	return UGameplayStatics::DeleteGameInSlot(SlotName, 0);
 }
 
-USaveGame* USaveGameSubsystem::GetCurrentSaveGameObject() const
+USaveGameMain* USaveGameSubsystem::GetCurrentSaveGameObject() const
 {
 	return CurrentSaveGameObject;
 }
@@ -139,32 +114,19 @@ void USaveGameSubsystem::DeleteAllSaveGameSlots()
 {
 	for (const auto SaveGameName : SaveGameNames)
 	{
-		if (SaveGameName != SaveSettingsDataName && SaveGameName != SaveCollectiblesDataName)
-		{
-			UGameplayStatics::DeleteGameInSlot(SaveGameName, 0);
-		}
+
+		UGameplayStatics::DeleteGameInSlot(SaveGameName, 0);
 	}
 	SaveGameNames.Empty();
 }
 
 void USaveGameSubsystem::SetCurrentSaveGameObject(const FString SlotName, USaveGame* SaveGameObject)
 {
-	CurrentSaveGameObject = SaveGameObject;
-	CurrentSaveGameSlot = SlotName;
-}
+	if (SaveGameObject->IsA<USaveGameMain>())
+	{
+		CurrentSaveGameObject = Cast<USaveGameMain>(SaveGameObject);
+		CurrentSaveGameSlot = SlotName;
 
-bool USaveGameSubsystem::LoadSaveSettingsData(USaveGame*& SaveGameObject)
-{
-	SaveGameObject = UGameplayStatics::LoadGameFromSlot(SaveSettingsDataName, 0);
-	SaveSettingsObject = SaveGameObject;
-
-	return SaveSettingsObject ? true : false;
-}
-
-bool USaveGameSubsystem::LoadSaveCollectiblesData(USaveGame*& SaveGameObject)
-{
-	SaveGameObject = UGameplayStatics::LoadGameFromSlot(SaveCollectiblesDataName, 0);
-	SaveCollectiblesObject = SaveGameObject;
-
-	return SaveCollectiblesObject ? true : false;
+		OnChangeSaveGameObject.Broadcast(CurrentSaveGameObject);
+	}
 }

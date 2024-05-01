@@ -1,9 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "ActorComponent/SaveGame/SaveGameActorComponent.h"
+#include "SaveGameActorComponent.h"
 #include "Subsystem/SaveGameSubsystem.h"
+#include "SaveGame/SaveGameMain.h"
 
 USaveGameSubsystem* USaveGameActorComponent::SaveGameSubsytem = nullptr;
+USaveGameMain* USaveGameActorComponent::SaveGameObject = nullptr;
 
 // Sets default values for this component's properties
 USaveGameActorComponent::USaveGameActorComponent()
@@ -20,14 +22,37 @@ void USaveGameActorComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	bIsDynamicSpawn = GetOwner()->GetOuter() ? false : true;
+
 	if (!SaveGameSubsytem)
 	{
 		LoadSaveGameSubsystem();
 	}
 
+	// Bind on delegates:
 	if (SaveGameSubsytem)
 	{
-		SaveGameSubsytem->OnStartSave.AddDynamic(this, &USaveGameActorComponent::OnSaveGameData);
+		SaveGameSubsytem->OnStartSave.AddDynamic(this, &USaveGameActorComponent::SaveGameData);
+		SaveGameSubsytem->OnChangeSaveGameObject.AddDynamic(this, &USaveGameActorComponent::ChangeSaveGameObject);
+
+		// Get current save game object:
+		if (!SaveGameObject)
+		{
+			SaveGameObject = SaveGameSubsytem->GetCurrentSaveGameObject();
+		}
+	}
+
+	CheckSaveInfoByOwner();
+
+	GetOwner()->OnDestroyed.AddDynamic(this, &USaveGameActorComponent::OwnerIsDestroed);
+}
+
+void USaveGameActorComponent::OwnerIsDestroed(AActor* DestroyedActor)
+{
+	if (DestroyedActor == GetOwner())
+	{
+		bIsDestroyedOnwer = true;
+		SaveGameData();
 	}
 }
 
@@ -41,6 +66,7 @@ void USaveGameActorComponent::LoadSaveGameSubsystem()
 		{
 			// take USaveGameSubsystem
 			SaveGameSubsytem = GameInstance->GetSubsystem<USaveGameSubsystem>();
+
 			if (!SaveGameSubsytem)
 			{
 				UE_LOG(LogTemp, Error, TEXT("Failed to get SaveGameSubsytem."));
@@ -58,9 +84,79 @@ USaveGameSubsystem* USaveGameActorComponent::GetSaveGameSubsystem() const
 	return SaveGameSubsytem;
 }
 
-void USaveGameActorComponent::OnSaveGameData()
+void USaveGameActorComponent::SaveGameData()
 {
-	OnUpdateSaveGameData.Broadcast(true, FName(GetOwner()->GetName()), SaveGameSubsytem);
+	if (SaveGameObject)
+	{
+		if (bIsDynamicSpawn)
+		{
+			if (bIsDestroyedOnwer)
+			{
+				SaveGameObject->RemoveDynamicSaveInfoActor(FName(GetOwner()->GetName()));
+			}
+			else
+			{
+				FDynamicSaveInfoActor DynamicSaveInfoActor;
+				DynamicSaveInfoActor.Class = GetOwner()->GetClass();
+				DynamicSaveInfoActor.Transform = GetOwner()->GetActorTransform();
+				SaveGameObject->AddDynamicSaveInfoActor(FName(GetOwner()->GetName()), DynamicSaveInfoActor);
+			}
+		}
+		else
+		{
+			FSaveInfoActor SaveInfoActor;
+			SaveInfoActor.bIsDestroyed = bIsDestroyedOnwer;
+			SaveInfoActor.Transform = GetOwner()->GetActorTransform();
+			SaveGameObject->AddSaveInfoActor(FName(GetOwner()->GetName()), SaveInfoActor);
+		}
+	}
+
+	OnSaveGameData.Broadcast(SaveGameObject);
+}
+
+void USaveGameActorComponent::ChangeSaveGameObject(USaveGameMain* NewSaveGameObject)
+{
+	if (SaveGameObject != NewSaveGameObject)
+	{
+		SaveGameObject = NewSaveGameObject;
+	}
+
+	// if (!bIsCheckSaveInfo)
+	//{
+	CheckSaveInfoByOwner();
+
+	OnLoadGameData.Broadcast(NewSaveGameObject);
+}
+
+void USaveGameActorComponent::CheckSaveInfoByOwner()
+{
+	if (SaveGameObject)
+	{
+		if (bIsDynamicSpawn)
+		{
+			SaveGameData();
+		}
+		else
+		{
+			FSaveInfoActor SaveInfoActor;
+			if (SaveGameObject->GetSaveInfoActor(FName(GetOwner()->GetName()), SaveInfoActor))
+			{
+				if (SaveInfoActor.bIsDestroyed)
+				{
+					GetOwner()->Destroy();
+				}
+				else
+				{
+					GetOwner()->SetActorTransform(SaveInfoActor.Transform);
+				}
+			}
+			else
+			{
+				SaveGameData();
+			}
+		}
+		bIsCheckSaveInfo = true;
+	}
 }
 
 // Called every frame
@@ -69,4 +165,14 @@ void USaveGameActorComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+void USaveGameActorComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (EndPlayReason == EEndPlayReason::Quit || EndPlayReason == EEndPlayReason::EndPlayInEditor)
+	{
+		SaveGameObject = nullptr;
+		SaveGameSubsytem = nullptr;
+	}
+	Super::EndPlay(EndPlayReason);
 }

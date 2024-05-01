@@ -10,6 +10,7 @@
 class UGameInstanceMain;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnUpdateInventorySlot, int32, Index, FInventorySlotInfo, NewInfo);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoadInventoryInfo);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class TT_269_API UInventoryComponent : public UActorComponent
@@ -19,6 +20,9 @@ class TT_269_API UInventoryComponent : public UActorComponent
 public:
 	// Sets default values for this component's properties
 	UInventoryComponent();
+
+	UPROPERTY(BlueprintAssignable, Category = "Inventory")
+	FOnLoadInventoryInfo OnLoadInventoryInfo;
 
 	UPROPERTY(BlueprintAssignable, Category = "Inventory")
 	FOnUpdateInventorySlot OnUpdateInventorySlot;
@@ -37,6 +41,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void ChangeInventorySlot(const int32 Index, const FInventorySlotInfo& NewInventorySlotInfo);
+
+	UFUNCTION(BlueprintCallable, Category = "SaveGame")
+	void LoadInventoryInfo(const TArray<FInventorySlotInfo>& NewInventoryInfo);
 
 protected:
 	// Called when the game starts

@@ -100,6 +100,12 @@ void UInventoryComponent::ChangeInventorySlot(const int32 Index, const FInventor
 	}
 }
 
+void UInventoryComponent::LoadInventoryInfo(const TArray<FInventorySlotInfo>& NewInventoryInfo)
+{
+	InventoryInfo = NewInventoryInfo;
+	OnLoadInventoryInfo.Broadcast();
+}
+
 // Called when the game starts
 void UInventoryComponent::BeginPlay()
 {
