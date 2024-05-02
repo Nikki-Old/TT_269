@@ -92,3 +92,8 @@ void UWeaponInventoryComponent::LoadWeaponsInfo(const TMap<EWeaponSlotType, FWea
 	WeaponsInfo[EWeaponSlotType::Second_Type] = NewWeaponsInfo[EWeaponSlotType::Second_Type];
 	OnLoadWeaponInfo.Broadcast();
 }
+
+void UWeaponInventoryComponent::UpdateCurrentWeaponAmmoQuantity(int32 NewAmmoQuantity)
+{
+	WeaponsInfo[CurrentWeaponInfoSlot].CurrentAmmo = NewAmmoQuantity;
+}

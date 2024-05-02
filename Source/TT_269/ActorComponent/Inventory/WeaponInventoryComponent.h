@@ -49,6 +49,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SaveGame")
 	void LoadWeaponsInfo(const TMap<EWeaponSlotType, FWeaponActorInfo>& NewWeaponsInfo);
 
+	UFUNCTION(BlueprintCallable, Category = "WeaponInventory")
+	void UpdateCurrentWeaponAmmoQuantity(int32 NewAmmoQuantity);
+
 private:
 	UPROPERTY()
 	TMap<EWeaponSlotType, FWeaponActorInfo> WeaponsInfo = {};

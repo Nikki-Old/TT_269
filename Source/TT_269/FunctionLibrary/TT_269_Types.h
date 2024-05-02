@@ -236,6 +236,7 @@ struct FWeaponActorInfo : public FInventorySlotInfo
 	}
 };
 
+/** Save info */
 USTRUCT(BlueprintType)
 struct FPlayerCharacterSaveInfo
 {
@@ -250,6 +251,17 @@ struct FPlayerCharacterSaveInfo
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "SaveGame")
 	TMap<EWeaponSlotType, FWeaponActorInfo> WeaponsInfo = {};
 };
+
+///** Save info */
+//USTRUCT(BlueprintType)
+//struct FTurretSaveInfo
+//{
+//	GENERATED_BODY()
+//
+//	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "SaveGame")
+//	float 
+//};
+
 
 UCLASS()
 class TT_269_API UTT_269_Types : public UBlueprintFunctionLibrary
