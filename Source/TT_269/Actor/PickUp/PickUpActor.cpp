@@ -2,7 +2,10 @@
 
 
 #include "PickUpActor.h"
+#include "Serialization/ObjectAndNameAsStringProxyArchive.h"
+
 #include "ItemDataAsset/ItemDataAsset.h"
+#include "FunctionLibrary/TT_269_Types.h"
 
 // Sets default values
 APickUpActor::APickUpActor()
@@ -13,6 +16,34 @@ APickUpActor::APickUpActor()
 	// Create scene component and set root:
 	SceneComponent = CreateDefaultSubobject<USceneComponent>("Scene");
 	this->SetRootComponent(SceneComponent);
+}
+
+FActorSaveData APickUpActor::GetSaveDataRecord_Implementation()
+{
+	FActorSaveData Record = FActorSaveData();
+
+	Record.Class = this->GetClass();
+	Record.Name = this->GetName();
+	Record.Transform = this->GetTransform();
+
+	FMemoryWriter Writer = FMemoryWriter(Record.BinaryData);
+	FObjectAndNameAsStringProxyArchive Ar(Writer, false);
+	Ar.ArIsSaveGame = true;
+
+	this->Serialize(Ar);
+
+	return Record;
+}
+
+void APickUpActor::LoadFromSaveDataRecord_Implementation()
+{
+	FActorSaveData Record = FActorSaveData();
+
+	FMemoryReader Reader = FMemoryReader(Record.BinaryData);
+	FObjectAndNameAsStringProxyArchive Ar(Reader, false);
+	Ar.ArIsSaveGame = true;
+
+	this->Serialize(Ar);
 }
 
 // Called when the game starts or when spawned

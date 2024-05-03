@@ -6,13 +6,14 @@
 #include "GameFramework/Actor.h"
 #include "Engine/DataTable.h"
 #include "Interface/InteractInterface.h"
+#include "Interface/SavableObject.h"
 #include "PickUpActor.generated.h"
 
 class USphereComponent;
 class UItemDataAsset;
 
 UCLASS()
-class TT_269_API APickUpActor : public AActor, public IInteractInterface
+class TT_269_API APickUpActor : public AActor, public IInteractInterface, public ISavableObject
 {
 	GENERATED_BODY()
 
@@ -23,6 +24,14 @@ public:
 	/** Get PickUpDataAsset */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "PickUp")
 	void GetItemDataAsset(UItemDataAsset*& OutInfo) const { OutInfo = ItemDataAsset; }
+
+#pragma region ISavableObject
+	/** Get */
+	virtual FActorSaveData GetSaveDataRecord_Implementation() override;
+
+	/** Set */
+	virtual void LoadFromSaveDataRecord_Implementation() override;
+#pragma endregion
 
 #pragma region IInteractInterface
 

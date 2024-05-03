@@ -211,6 +211,30 @@ struct FWeaponActorInfo : public FInventorySlotInfo
 	}
 };
 
+/** Main save data record for actors. */
+USTRUCT(BlueprintType)
+struct FActorSaveData
+{
+	GENERATED_BODY()
+
+public:
+	/** Actor class */
+	UPROPERTY(SaveGame)
+	UClass* Class = nullptr;
+
+	/** Actor Name */
+	UPROPERTY(SaveGame)
+	FString Name = "";
+
+	/** Actor transform */
+	UPROPERTY(SaveGame)
+	FTransform Transform = FTransform();
+
+	/** Other values in the form of binary data */
+	UPROPERTY(SaveGame)
+	TArray<uint8> BinaryData = {};
+};
+
 UCLASS()
 class TT_269_API UTT_269_Types : public UBlueprintFunctionLibrary
 {
