@@ -11,6 +11,17 @@
 
 class USphereComponent;
 class UItemDataAsset;
+class USaveGameActorComponent;
+class USaveGameMain;
+
+//USTRUCT(BlueprintType)
+//struct FPickUpActorSaveInfo
+//{
+//	GENERATED_BODY()
+//
+//	UPROPERTY(EditAnyWhere, BlueprintReadWite, Category = "SaveGame")
+//	int32 Quantity = 0;
+//};
 
 UCLASS()
 class TT_269_API APickUpActor : public AActor, public IInteractInterface, public ISavableObject
@@ -20,6 +31,10 @@ class TT_269_API APickUpActor : public AActor, public IInteractInterface, public
 public:
 	// Sets default values for this actor's properties
 	APickUpActor();
+
+	/** Save game actor component */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "SaveGame")
+	USaveGameActorComponent* SaveGameComponent = nullptr;
 
 	/** Get PickUpDataAsset */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "PickUp")
@@ -73,6 +88,10 @@ protected:
 	/** Data asset for this actor with name and type */
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "PickUp", meta = (ExposeOnSpawn = true))
 	UItemDataAsset* ItemDataAsset = nullptr;
+
+	UFUNCTION(BlueprintNativeEvent, Category = "SaveGame")
+	void SaveActorInfo(USaveGameMain* SaveGameObject);
+	void SaveActorInfo_Implementation(USaveGameMain* SaveGameObject);
 
 public:
 	// Called every frame

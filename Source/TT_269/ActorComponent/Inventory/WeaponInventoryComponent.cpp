@@ -85,3 +85,15 @@ bool UWeaponInventoryComponent::SetCurrentWeaponInfoBySlotType(EWeaponSlotType T
 
 	return false;
 }
+
+void UWeaponInventoryComponent::LoadWeaponsInfo(const TMap<EWeaponSlotType, FWeaponActorInfo>& NewWeaponsInfo)
+{
+	WeaponsInfo[EWeaponSlotType::First_Type] = NewWeaponsInfo[EWeaponSlotType::First_Type];
+	WeaponsInfo[EWeaponSlotType::Second_Type] = NewWeaponsInfo[EWeaponSlotType::Second_Type];
+	OnLoadWeaponInfo.Broadcast();
+}
+
+void UWeaponInventoryComponent::UpdateCurrentWeaponAmmoQuantity(int32 NewAmmoQuantity)
+{
+	WeaponsInfo[CurrentWeaponInfoSlot].CurrentAmmo = NewAmmoQuantity;
+}
