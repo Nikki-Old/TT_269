@@ -8,7 +8,7 @@ public class TT_269 : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG"});
 
 		PublicIncludePaths.AddRange(new string[] { "TT_269", "TT_269/Interface", "TT_269/DataAsset", "TT_269/ActorComponent" });
 

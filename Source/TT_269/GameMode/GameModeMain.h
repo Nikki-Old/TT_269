@@ -14,15 +14,4 @@ UCLASS()
 class TT_269_API AGameModeMain : public AGameModeBase
 {
 	GENERATED_BODY()
-
-public:
-	/** Load  */
-	UFUNCTION(BlueprintCallable, Category = "Game Play")
-	void LoadActorsData();
-
-	UFUNCTION(BlueprintCallable, Category = "Game Play")
-	void SaveActorsData();
-
-protected:
-	TArray<FActorSaveData> DataRecords = {};
 };

@@ -4,17 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "FunctionLibrary/TT_269_Types.h"
+#include "Interface/SavableObject.h"
+#include "Subsystem/SaveGameSubsystem.h"
 #include "SaveGameActorComponent.generated.h"
 
 class USaveGameSubsystem;
 class USaveGameMain;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSaveGameData, USaveGameMain*, SaveGame);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnLoadGameData, USaveGameMain*, SaveGame);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSaveGameData);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoadGameData);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class TT_269_API USaveGameActorComponent : public UActorComponent
+class TT_269_API USaveGameActorComponent : public UActorComponent, public ISavableObject
 {
 	GENERATED_BODY()
 
@@ -26,6 +27,14 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason);
+
+#pragma region ISavableObject
+	/** Get Save Data */
+	virtual bool GetSaveDataRecord_Implementation(FActorSaveData& SaveData);
+
+	/** Set Save Data */
+	virtual bool LoadFromSaveDataRecord_Implementation(const FActorSaveData& SaveData);
+#pragma endregion
 
 protected:
 	// Called when the game starts
@@ -47,7 +56,7 @@ public:
 	USaveGameSubsystem* GetSaveGameSubsystem() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SaveGame")
-	FORCEINLINE bool IsDynamicSpawn() const { return bIsDynamicSpawn; }
+	FORCEINLINE bool IsDynamicSpawn() const { return bIsSpawnedOwner; }
 
 	UFUNCTION()
 	void OwnerIsDestroed(AActor* DestroyedActor);
@@ -56,19 +65,12 @@ protected:
 	static USaveGameSubsystem* SaveGameSubsytem;
 	void LoadSaveGameSubsystem();
 
-	UFUNCTION()
-	void SaveGameData();
-
 	static USaveGameMain* SaveGameObject;
 
 	UFUNCTION()
 	void ChangeSaveGameObject(USaveGameMain* NewSaveGameObject);
 
-	UFUNCTION()
-	void CheckSaveInfoByOwner();
-
 private:
-	bool bIsCheckSaveInfo = false;
-	bool bIsDynamicSpawn = false;
+	bool bIsSpawnedOwner = false;
 	bool bIsDestroyedOnwer = false;
 };

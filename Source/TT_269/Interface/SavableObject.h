@@ -25,11 +25,11 @@ class TT_269_API ISavableObject
 public:
 	/** Get */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SaveLoad")
-	FActorSaveData GetSaveDataRecord();
-	virtual FActorSaveData GetSaveDataRecord_Implementation();
+	bool GetSaveDataRecord(FActorSaveData& SaveData);
+	virtual bool GetSaveDataRecord_Implementation(FActorSaveData& SaveData);
 
 	/** Set */
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "SaveLoad")
-	void LoadFromSaveDataRecord();
-	virtual void LoadFromSaveDataRecord_Implementation();
+	bool LoadFromSaveDataRecord(const FActorSaveData& SaveData);
+	virtual bool LoadFromSaveDataRecord_Implementation(const FActorSaveData& SaveData);
 };

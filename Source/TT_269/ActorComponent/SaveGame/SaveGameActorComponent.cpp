@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "SaveGameActorComponent.h"
-#include "Subsystem/SaveGameSubsystem.h"
+#include "Serialization/ObjectAndNameAsStringProxyArchive.h"
+
 #include "SaveGame/SaveGameMain.h"
 
 USaveGameSubsystem* USaveGameActorComponent::SaveGameSubsytem = nullptr;
@@ -22,7 +23,8 @@ void USaveGameActorComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	bIsDynamicSpawn = GetOwner()->GetOuter() ? false : true;
+	// Is dynamic spawn?
+	bIsSpawnedOwner = GetOwner()->GetOuter() ? false : true;
 
 	if (!SaveGameSubsytem)
 	{
@@ -32,8 +34,8 @@ void USaveGameActorComponent::BeginPlay()
 	// Bind on delegates:
 	if (SaveGameSubsytem)
 	{
-		SaveGameSubsytem->OnStartSave.AddDynamic(this, &USaveGameActorComponent::SaveGameData);
-		SaveGameSubsytem->OnChangeSaveGameObject.AddDynamic(this, &USaveGameActorComponent::ChangeSaveGameObject);
+		// Add tag for owner:
+		GetOwner()->Tags.Add(SaveGameSubsytem->GetSaveGameTag());
 
 		// Get current save game object:
 		if (!SaveGameObject)
@@ -42,8 +44,6 @@ void USaveGameActorComponent::BeginPlay()
 		}
 	}
 
-	CheckSaveInfoByOwner();
-
 	GetOwner()->OnDestroyed.AddDynamic(this, &USaveGameActorComponent::OwnerIsDestroed);
 }
 
@@ -51,8 +51,10 @@ void USaveGameActorComponent::OwnerIsDestroed(AActor* DestroyedActor)
 {
 	if (DestroyedActor == GetOwner())
 	{
-		bIsDestroyedOnwer = true;
-		SaveGameData();
+		if (!bIsSpawnedOwner)
+		{
+			SaveGameSubsytem->AddDestroedObject(DestroyedActor->GetName());
+		}
 	}
 }
 
@@ -84,36 +86,6 @@ USaveGameSubsystem* USaveGameActorComponent::GetSaveGameSubsystem() const
 	return SaveGameSubsytem;
 }
 
-void USaveGameActorComponent::SaveGameData()
-{
-	if (SaveGameObject)
-	{
-		if (bIsDynamicSpawn)
-		{
-			if (bIsDestroyedOnwer)
-			{
-				SaveGameObject->RemoveDynamicSaveInfoActor(FName(GetOwner()->GetName()));
-			}
-			else
-			{
-				FDynamicSaveInfoActor DynamicSaveInfoActor;
-				DynamicSaveInfoActor.Class = GetOwner()->GetClass();
-				DynamicSaveInfoActor.Transform = GetOwner()->GetActorTransform();
-				SaveGameObject->AddDynamicSaveInfoActor(FName(GetOwner()->GetName()), DynamicSaveInfoActor);
-			}
-		}
-		else
-		{
-			FSaveInfoActor SaveInfoActor;
-			SaveInfoActor.bIsDestroyed = bIsDestroyedOnwer;
-			SaveInfoActor.Transform = GetOwner()->GetActorTransform();
-			SaveGameObject->AddSaveInfoActor(FName(GetOwner()->GetName()), SaveInfoActor);
-		}
-	}
-
-	OnSaveGameData.Broadcast(SaveGameObject);
-}
-
 void USaveGameActorComponent::ChangeSaveGameObject(USaveGameMain* NewSaveGameObject)
 {
 	if (SaveGameObject != NewSaveGameObject)
@@ -121,42 +93,7 @@ void USaveGameActorComponent::ChangeSaveGameObject(USaveGameMain* NewSaveGameObj
 		SaveGameObject = NewSaveGameObject;
 	}
 
-	// if (!bIsCheckSaveInfo)
-	//{
-	CheckSaveInfoByOwner();
-
-	OnLoadGameData.Broadcast(NewSaveGameObject);
-}
-
-void USaveGameActorComponent::CheckSaveInfoByOwner()
-{
-	if (SaveGameObject)
-	{
-		if (bIsDynamicSpawn)
-		{
-			SaveGameData();
-		}
-		else
-		{
-			FSaveInfoActor SaveInfoActor;
-			if (SaveGameObject->GetSaveInfoActor(FName(GetOwner()->GetName()), SaveInfoActor))
-			{
-				if (SaveInfoActor.bIsDestroyed)
-				{
-					GetOwner()->Destroy();
-				}
-				else
-				{
-					GetOwner()->SetActorTransform(SaveInfoActor.Transform);
-				}
-			}
-			else
-			{
-				SaveGameData();
-			}
-		}
-		bIsCheckSaveInfo = true;
-	}
+	OnLoadGameData.Broadcast();
 }
 
 // Called every frame
@@ -175,4 +112,41 @@ void USaveGameActorComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 		SaveGameSubsytem = nullptr;
 	}
 	Super::EndPlay(EndPlayReason);
+}
+
+bool USaveGameActorComponent::GetSaveDataRecord_Implementation(FActorSaveData& SaveData)
+{
+	FActorSaveData Record = FActorSaveData();
+
+	Record.Class = GetOwner()->GetClass();
+	Record.Name = GetOwner()->GetName();
+	Record.Transform = GetOwner()->GetTransform();
+
+	FMemoryWriter Writer = FMemoryWriter(Record.BinaryData);
+	FObjectAndNameAsStringProxyArchive Ar(Writer, false);
+	Ar.ArIsSaveGame = true;
+
+	GetOwner()->Serialize(Ar);
+	OnSaveGameData.Broadcast();
+
+	SaveData = Record;
+
+	return true;
+}
+
+bool USaveGameActorComponent::LoadFromSaveDataRecord_Implementation(const FActorSaveData& SaveData)
+{
+	FActorSaveData Record = FActorSaveData();
+
+	FMemoryReader Reader = FMemoryReader(Record.BinaryData);
+	FObjectAndNameAsStringProxyArchive Ar(Reader, false);
+	Ar.ArIsSaveGame = true;
+
+	GetOwner()->Serialize(Ar);
+
+	GetOwner()->SetActorTransform(SaveData.Transform);
+
+	OnLoadGameData.Broadcast();
+
+	return true;
 }

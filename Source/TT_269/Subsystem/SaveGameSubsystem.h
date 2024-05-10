@@ -8,9 +8,29 @@
 
 class USaveGameMain;
 
-/**
- *
- */
+/** Main save data record for actors. */
+USTRUCT(BlueprintType)
+struct FActorSaveData
+{
+	GENERATED_BODY()
+
+public:
+	/** Actor class */
+	UPROPERTY(SaveGame)
+	UClass* Class = nullptr;
+
+	/** Actor Name */
+	UPROPERTY(SaveGame)
+	FString Name = "";
+
+	/** Actor transform */
+	UPROPERTY(SaveGame)
+	FTransform Transform = FTransform();
+
+	/** Other values in the form of binary data */
+	UPROPERTY(SaveGame)
+	TArray<uint8> BinaryData = {};
+};
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartSave);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnChangeSaveGameObject, USaveGameMain*, NewSaveGameObject);
@@ -26,14 +46,13 @@ public:
 	virtual void Deinitialize() override;
 	// End USubsystem
 
+	/** Delegate broadcast start Save actors info */
 	UPROPERTY(BlueprintAssignable, Category = "SaveGameSubsystem")
-	FOnStartSave OnStartSave;
+	FOnStartSave OnStartSaveData;
 
+	/** Delegate broadcast in start load new Save data */
 	UPROPERTY(BlueprintAssignable, Category = "SaveGameSubsystem")
-	FOnChangeSaveGameObject OnChangeSaveGameObject;
-
-	UFUNCTION(BlueprintCallable, Category = "SaveGameSubsystem")
-	void CallStartSave();
+	FOnChangeSaveGameObject OnStartLoadSaveData;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SaveGameSubsystem")
 	TArray<FString> GetAllSaveGames();
@@ -42,7 +61,7 @@ public:
 	bool CreateNewSaveGame(const FString SlotName, TSubclassOf<USaveGame> SaveGameClass, USaveGame*& SaveGameObject);
 
 	UFUNCTION(BlueprintCallable, Category = "SaveGameSubsystem")
-	void SaveGameObject(const FString SlotName, USaveGame* SaveGameObject);
+	void SaveGameObject(const FString SlotName, USaveGameMain* SaveGameObject);
 
 	UFUNCTION(BlueprintCallable, Category = "SaveGameSubsystem")
 	bool LoadSaveGame(const FString SlotName, USaveGame*& SaveGameObject);
@@ -60,17 +79,59 @@ public:
 	void DeleteAllSaveGameSlots();
 
 	UFUNCTION(BlueprintCallable, Category = "SaveGameSubsystem")
-	void SetCurrentSaveGameObject(const FString SlotName, USaveGame* SaveGameObject);
+	void SetCurrentSaveGameObject(const FString SlotName, USaveGameMain* SaveGameObject);
+
+	/** Load actors info */
+	UFUNCTION(BlueprintCallable, Category = "SaveGameSubsystem")
+	void LoadActorsData();
+
+	/** Save actors info */
+	UFUNCTION(BlueprintCallable, Category = "SaveGameSubsystem")
+	void SaveActorsInfo();
+
+	/** Get save game tag for actors */
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SaveGameSubsystem")
+	FName GetSaveGameTag() const { return SaveGameTag; }
+
+	UFUNCTION(BlueprintCallable, Category = "SaveGameSubsystem")
+	void AddDestroedObject(const FString& DestroedObjectName);
+
+	UFUNCTION(BlueprintCallable, Category = "SaveGameSubsystem")
+	void ClearDestroedObjectInfromation();
+
+protected:
+	/** Actors on level  info */
+	UPROPERTY(SaveGame)
+	TMap<FString, FActorSaveData> ActorsInfoOnLevel = {};
+
+	/** Spawned actors info */
+	UPROPERTY(SaveGame)
+	TMap<FString, FActorSaveData> SpawnedActorsInfo = {};
+
+	UPROPERTY(SaveGame)
+	TArray<FString> DestroedObjects = {};
+
+	/** Called after async save game data*/
+	UFUNCTION()
+	void AsyncSaveGameDataIsEnd(const FString& SlotName, const int32 UserIndex, bool bSuccess);
 
 private:
+	/** Check is actor in "DestroedObjects" */
+	bool IsDestroedActor(FString ActorName) const;
+
+	/** Current Save game info */
 	UPROPERTY()
 	USaveGameMain* CurrentSaveGameObject = nullptr;
-
 	UPROPERTY()
 	FString CurrentSaveGameSlot = "";
 
+	/** Save game tag for actors */
+	FName SaveGameTag = "SaveGameActor";
+
+	/** All save game names */
 	UPROPERTY()
 	TArray<FString> SaveGameNames;
 
-	uint8 MaxSaveSlot = 8;
+	/** Max save slots */
+	uint8 MaxSaveSlots = 8;
 };

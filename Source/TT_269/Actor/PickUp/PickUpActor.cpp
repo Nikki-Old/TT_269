@@ -21,35 +21,6 @@ APickUpActor::APickUpActor()
 
 	// Create save game actor component:
 	SaveGameComponent = CreateDefaultSubobject<USaveGameActorComponent>(TEXT("SaveGameComponent"));
-	SaveGameComponent->OnSaveGameData.AddDynamic(this, &APickUpActor::SaveActorInfo);
-}
-
-FActorSaveData APickUpActor::GetSaveDataRecord_Implementation()
-{
-	FActorSaveData Record = FActorSaveData();
-
-	Record.Class = this->GetClass();
-	Record.Name = this->GetName();
-	Record.Transform = this->GetTransform();
-
-	FMemoryWriter Writer = FMemoryWriter(Record.BinaryData);
-	FObjectAndNameAsStringProxyArchive Ar(Writer, false);
-	Ar.ArIsSaveGame = true;
-
-	this->Serialize(Ar);
-
-	return Record;
-}
-
-void APickUpActor::LoadFromSaveDataRecord_Implementation()
-{
-	FActorSaveData Record = FActorSaveData();
-
-	FMemoryReader Reader = FMemoryReader(Record.BinaryData);
-	FObjectAndNameAsStringProxyArchive Ar(Reader, false);
-	Ar.ArIsSaveGame = true;
-
-	this->Serialize(Ar);
 }
 
 // Called when the game starts or when spawned
@@ -57,10 +28,6 @@ void APickUpActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-}
-
-void APickUpActor::SaveActorInfo_Implementation(USaveGameMain* SaveGameObject)
-{
 }
 
 // Called every frame

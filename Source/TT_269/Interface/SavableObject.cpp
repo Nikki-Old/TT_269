@@ -5,11 +5,12 @@
 
 // Add default functionality here for any ISavableObject functions that are not pure virtual.
 
-FActorSaveData ISavableObject::GetSaveDataRecord_Implementation()
+bool ISavableObject::GetSaveDataRecord_Implementation(FActorSaveData& SaveData)
 {
-	return FActorSaveData();
+	return false;
 }
 
-void ISavableObject::LoadFromSaveDataRecord_Implementation()
+bool ISavableObject::LoadFromSaveDataRecord_Implementation(const FActorSaveData& SaveData)
 {
+	return false;
 }

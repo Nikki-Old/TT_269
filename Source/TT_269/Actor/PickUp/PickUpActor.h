@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Engine/DataTable.h"
 #include "Interface/InteractInterface.h"
-#include "Interface/SavableObject.h"
+
 #include "PickUpActor.generated.h"
 
 class USphereComponent;
@@ -24,7 +24,7 @@ class USaveGameMain;
 //};
 
 UCLASS()
-class TT_269_API APickUpActor : public AActor, public IInteractInterface, public ISavableObject
+class TT_269_API APickUpActor : public AActor, public IInteractInterface
 {
 	GENERATED_BODY()
 
@@ -39,14 +39,6 @@ public:
 	/** Get PickUpDataAsset */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "PickUp")
 	void GetItemDataAsset(UItemDataAsset*& OutInfo) const { OutInfo = ItemDataAsset; }
-
-#pragma region ISavableObject
-	/** Get */
-	virtual FActorSaveData GetSaveDataRecord_Implementation() override;
-
-	/** Set */
-	virtual void LoadFromSaveDataRecord_Implementation() override;
-#pragma endregion
 
 #pragma region IInteractInterface
 
@@ -88,10 +80,6 @@ protected:
 	/** Data asset for this actor with name and type */
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "PickUp", meta = (ExposeOnSpawn = true))
 	UItemDataAsset* ItemDataAsset = nullptr;
-
-	UFUNCTION(BlueprintNativeEvent, Category = "SaveGame")
-	void SaveActorInfo(USaveGameMain* SaveGameObject);
-	void SaveActorInfo_Implementation(USaveGameMain* SaveGameObject);
 
 public:
 	// Called every frame
