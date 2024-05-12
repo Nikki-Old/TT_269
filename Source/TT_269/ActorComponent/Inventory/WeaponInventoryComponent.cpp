@@ -97,3 +97,12 @@ void UWeaponInventoryComponent::UpdateCurrentWeaponAmmoQuantity(int32 NewAmmoQua
 {
 	WeaponsInfo[CurrentWeaponInfoSlot].CurrentAmmo = NewAmmoQuantity;
 }
+
+bool UWeaponInventoryComponent::LoadSaveBinaryData_Implementation(const TArray<uint8>& NewBinaryData)
+{
+	Super::LoadSaveBinaryData_Implementation(NewBinaryData);
+
+	OnLoadWeaponInfo.Broadcast();
+
+	return false;
+}

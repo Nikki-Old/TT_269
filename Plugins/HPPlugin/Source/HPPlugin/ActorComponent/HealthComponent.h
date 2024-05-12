@@ -46,7 +46,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	void SetMaxHealth(float NewMaxHealh);
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Health")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, SaveGame, Category = "Health")
 	int MaxHealth = 100.0f;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Health")
@@ -64,7 +64,7 @@ protected:
 	virtual void InititalHealthComponent();
 
 	/** Healh: */
-	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, Category = "Health")
+	UPROPERTY(VisibleAnyWhere, BlueprintReadOnly, SaveGame, Category = "Health")
 	float Health = MaxHealth;
 
 	/**Is Dead*/
@@ -181,6 +181,6 @@ private:
 	UPROPERTY()
 	FVector DamageHitLocation = FVector(0);
 
-	UPROPERTY()
+	UPROPERTY(SaveGame)
 	AActor* LastDamageCauser = nullptr;
 };

@@ -18,11 +18,11 @@ class TT_269_API USaveGameMain : public USaveGame
 public:
 	/** Set game byte data */
 	UFUNCTION(BlueprintCallable, Category = "SaveGameMain")
-	FORCEINLINE void SetGameByteData(const TArray<uint8>& NewGameByteDate);
+	void SetGameByteData(const TArray<uint8>& NewGameByteDate);
 
 	/** Get game byte data */
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "SaveGameMain")
-	FORCEINLINE void GetGameByteData(TArray<uint8>& OutInfo);
+	void GetGameByteData(TArray<uint8>& OutInfo);
 
 protected:
 	/** All save data from actors */

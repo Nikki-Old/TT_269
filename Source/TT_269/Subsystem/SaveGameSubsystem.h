@@ -8,6 +8,15 @@
 
 class USaveGameMain;
 
+USTRUCT(BlueprintType)
+struct FActorComponentSaveData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(SaveGame)
+	TArray<uint8> BinaryData = {};
+};
+
 /** Main save data record for actors. */
 USTRUCT(BlueprintType)
 struct FActorSaveData
@@ -29,7 +38,11 @@ public:
 
 	/** Other values in the form of binary data */
 	UPROPERTY(SaveGame)
-	TArray<uint8> BinaryData = {};
+	TArray<uint8> ActorBinaryData = {};
+
+	/** Actor component name and binary data */
+	UPROPERTY(SaveGame)
+	TMap<FString, FActorComponentSaveData> ActorComponentsBinaryData = {};
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStartSave);
@@ -134,4 +147,6 @@ private:
 
 	/** Max save slots */
 	uint8 MaxSaveSlots = 8;
+
+	bool bIsStartLoadCurrentSaveGame = false;
 };

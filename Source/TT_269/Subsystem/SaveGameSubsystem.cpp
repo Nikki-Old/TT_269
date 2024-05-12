@@ -74,15 +74,15 @@ void USaveGameSubsystem::SaveGameObject(const FString SlotName, USaveGameMain* S
 		SaveActorsInfo();
 
 		// Create binary data for this object:
-		TArray<uint8> BinaryData;
-		FMemoryWriter Writer = FMemoryWriter(BinaryData);
+		TArray<uint8> ActorBinaryData;
+		FMemoryWriter Writer = FMemoryWriter(ActorBinaryData);
 		FObjectAndNameAsStringProxyArchive Archive(Writer, false);
 		Archive.ArIsSaveGame = true;
 		Archive.ArNoDelta = true;
 		this->Serialize(Archive);
 
 		// Set binary data in save game object:
-		SaveGameObject->SetGameByteData(BinaryData);
+		SaveGameObject->SetGameByteData(ActorBinaryData);
 
 		// Start async save game:
 		FAsyncSaveGameToSlotDelegate AsyncSaveGameArchive;
@@ -128,35 +128,53 @@ void USaveGameSubsystem::DeleteAllSaveGameSlots()
 
 void USaveGameSubsystem::SetCurrentSaveGameObject(const FString SlotName, USaveGameMain* SaveGameObject)
 {
-	CurrentSaveGameObject = SaveGameObject;
-	CurrentSaveGameSlot = SlotName;
+	if (!bIsStartLoadCurrentSaveGame)
+	{
+		bIsStartLoadCurrentSaveGame = true;
 
-	LoadActorsData();
+		CurrentSaveGameObject = SaveGameObject;
+		CurrentSaveGameSlot = SlotName;
+		// ClearDestroedObjectInfromation();
+		LoadActorsData();
+	}
 }
 
 void USaveGameSubsystem::LoadActorsData()
 {
 	OnStartLoadSaveData.Broadcast(CurrentSaveGameObject);
 
-	TArray<AActor*> FindActors;
+	TArray<AActor*> SavableActors = {};
 
 	// Get info:
-	TArray<uint8> BinaryData = {};
-	CurrentSaveGameObject->GetGameByteData(BinaryData);
+	TArray<uint8> ActorBinaryData = {};
+	CurrentSaveGameObject->GetGameByteData(ActorBinaryData);
 
-	FMemoryReader Reader = FMemoryReader(BinaryData);
+	FMemoryReader Reader = FMemoryReader(ActorBinaryData);
 	FObjectAndNameAsStringProxyArchive Arhive(Reader, false);
 	Arhive.ArIsSaveGame = true;
 	Arhive.ArNoDelta = true;
 	Serialize(Arhive);
 
+	TArray<AActor*> AllActors = {};
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), AllActors);
+	for (const auto Actor : AllActors)
 	{
+		if (!Actor->GetOuter())
+		{
+			Actor->Destroy();
+		}
+	}
+
+	{
+		TArray<AActor*> FindActors;
 		FString ActorName = "";
 		// Load actors with "USaveGameActorComponent":
 		UGameplayStatics::GetAllActorsOfClassWithTag(GetWorld(), AActor::StaticClass(), SaveGameTag, FindActors);
+		SavableActors.Append(FindActors);
 		for (const auto Actor : FindActors)
 		{
 			ActorName = Actor->GetName();
+
 			if (IsDestroedActor(ActorName))
 			{
 				Actor->Destroy();
@@ -169,7 +187,7 @@ void USaveGameSubsystem::LoadActorsData()
 
 					if (ActorsInfoOnLevel.Contains(ActorName))
 					{
-						if (ISavableObject::Execute_LoadFromSaveDataRecord(SaveComp, ActorsInfoOnLevel[ActorName]))
+						if (ISavableObject::Execute_LoadActorSaveData(SaveComp, ActorsInfoOnLevel[ActorName]))
 						{
 							// true
 						}
@@ -180,9 +198,11 @@ void USaveGameSubsystem::LoadActorsData()
 
 		// Load save info actors with "USavableObject" interface:
 		UGameplayStatics::GetAllActorsWithInterface(GetWorld(), USavableObject::StaticClass(), FindActors);
+		SavableActors.Append(FindActors);
 		for (const auto Actor : FindActors)
 		{
 			ActorName = Actor->GetName();
+
 			if (IsDestroedActor(ActorName))
 			{
 				Actor->Destroy();
@@ -191,7 +211,7 @@ void USaveGameSubsystem::LoadActorsData()
 			{
 				if (ActorsInfoOnLevel.Contains(ActorName))
 				{
-					if (ISavableObject::Execute_LoadFromSaveDataRecord(Actor, ActorsInfoOnLevel[ActorName]))
+					if (ISavableObject::Execute_LoadActorSaveData(Actor, ActorsInfoOnLevel[ActorName]))
 					{
 						// true
 					}
@@ -200,6 +220,55 @@ void USaveGameSubsystem::LoadActorsData()
 		}
 	}
 
+	// Check is have all actors on level:
+	for (const auto& ActorInfo : ActorsInfoOnLevel)
+	{
+		if (!IsDestroedActor(ActorInfo.Value.Name))
+		{
+			bool bIsFind = false;
+			for (const auto& Actor : SavableActors)
+			{
+				if (Actor->GetName() == ActorInfo.Value.Name)
+				{
+					bIsFind = true;
+					break;
+				}
+			}
+
+			if (!bIsFind)
+			{
+				FActorSpawnParameters SpawnParam = FActorSpawnParameters();
+				SpawnParam.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+				SpawnParam.Name = *ActorInfo.Value.Name;
+
+				auto NewActor = GetWorld()->SpawnActor<AActor>(ActorInfo.Value.Class, ActorInfo.Value.Transform, SpawnParam);
+				if (NewActor)
+				{
+					auto SaveComp = NewActor->GetComponentByClass<USaveGameActorComponent>();
+					if (SaveComp)
+					{
+
+						if (ActorsInfoOnLevel.Contains(ActorInfo.Value.Name))
+						{
+							if (ISavableObject::Execute_LoadActorSaveData(SaveComp, ActorsInfoOnLevel[ActorInfo.Value.Name]))
+							{
+								// true
+							}
+						}
+					}
+					else
+					{
+						if (ISavableObject::Execute_LoadActorSaveData(NewActor, ActorsInfoOnLevel[ActorInfo.Value.Name]))
+						{
+							// true
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Spawn "Spawned" actors:
 	for (const auto& ActorInfo : SpawnedActorsInfo)
 	{
 		FActorSpawnParameters SpawnParam = FActorSpawnParameters();
@@ -210,6 +279,7 @@ void USaveGameSubsystem::LoadActorsData()
 
 	// Clear after load:
 	ActorsInfoOnLevel.Empty();
+	bIsStartLoadCurrentSaveGame = false;
 }
 
 void USaveGameSubsystem::SaveActorsInfo()
@@ -232,7 +302,7 @@ void USaveGameSubsystem::SaveActorsInfo()
 			auto SaveComp = Actor->GetComponentByClass<USaveGameActorComponent>();
 			if (SaveComp)
 			{
-				if (ISavableObject::Execute_GetSaveDataRecord(SaveComp, ActorSaveData))
+				if (ISavableObject::Execute_GetActorSaveData(SaveComp, ActorSaveData))
 				{
 					bool bIsSpawnedActor = Actor->GetOuter() ? false : true;
 					if (bIsSpawnedActor)
@@ -254,7 +324,7 @@ void USaveGameSubsystem::SaveActorsInfo()
 		for (const auto Actor : FindActors)
 		{
 			ActorName = Actor->GetName();
-			if (ISavableObject::Execute_GetSaveDataRecord(Actor, ActorSaveData))
+			if (ISavableObject::Execute_GetActorSaveData(Actor, ActorSaveData))
 			{
 				bool bIsSpawnedActor = Actor->GetOuter() ? false : true;
 				if (bIsSpawnedActor)
@@ -295,5 +365,5 @@ void USaveGameSubsystem::AsyncSaveGameDataIsEnd(const FString& SlotName, const i
 
 bool USaveGameSubsystem::IsDestroedActor(FString ActorName) const
 {
-	return DestroedObjects.Contains(ActorName);
+	return DestroedObjects.Contains(ActorName) ? true : false;
 }

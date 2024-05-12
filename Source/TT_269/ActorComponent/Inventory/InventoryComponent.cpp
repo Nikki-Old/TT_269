@@ -1,8 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "ActorComponent/Inventory/InventoryComponent.h"
-#include "FunctionLibrary/FrameworkLibrary.h"
+#include "InventoryComponent.h"
+#include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 
+#include "FunctionLibrary/FrameworkLibrary.h"
 #include "GameInstance/GameInstanceMain.h"
 
 UGameInstanceMain* UInventoryComponent::GameInstanceMain = nullptr;
@@ -36,7 +37,20 @@ bool UInventoryComponent::AddItemInfo(const FItemActorInfo& NewItemInfo, int32 Q
 				if (TotalQuantity > InventroySlot.MaxItemQuantity)
 				{
 					InventoryInfo[Index].ItemQuantity = InventroySlot.MaxItemQuantity;
-		
+
+					Index = FindFreeIndexForSlot();
+					if (Index > -1)
+					{
+						FInventorySlotInfo NewSlot = FInventorySlotInfo();
+						if (GameInstanceMain->GetInventoryInfoByItemInfo(NewItemInfo, NewSlot))
+						{
+							NewSlot.ItemQuantity += Quantity;
+							InventoryInfo[Index] = NewSlot;
+							OnUpdateInventorySlot.Broadcast(Index, NewSlot);
+							return true;
+						}
+					}
+
 					if (InventoryInfo.Num() < MaxQuantityInventorySlots)
 					{
 						return CreateNewInventorySlot(NewItemInfo, TotalQuantity - InventroySlot.MaxItemQuantity);
@@ -50,6 +64,19 @@ bool UInventoryComponent::AddItemInfo(const FItemActorInfo& NewItemInfo, int32 Q
 
 				OnUpdateInventorySlot.Broadcast(Index, InventroySlot);
 				return true;
+			}
+
+			Index = FindFreeIndexForSlot();
+			if (Index > -1)
+			{
+				FInventorySlotInfo NewSlot = FInventorySlotInfo();
+				if (GameInstanceMain->GetInventoryInfoByItemInfo(NewItemInfo, NewSlot))
+				{
+					NewSlot.ItemQuantity += Quantity;
+					InventoryInfo[Index] = NewSlot;
+					OnUpdateInventorySlot.Broadcast(Index, NewSlot);
+					return true;
+				}
 			}
 
 			if (InventoryInfo.Num() < MaxQuantityInventorySlots)
@@ -95,7 +122,7 @@ void UInventoryComponent::ChangeInventorySlot(const int32 Index, const FInventor
 	if (InventoryInfo.IsValidIndex(Index))
 	{
 		InventoryInfo[Index] = NewInventorySlotInfo;
-		
+
 		OnUpdateInventorySlot.Broadcast(Index, NewInventorySlotInfo);
 	}
 }
@@ -104,6 +131,30 @@ void UInventoryComponent::LoadInventoryInfo(const TArray<FInventorySlotInfo>& Ne
 {
 	InventoryInfo = NewInventoryInfo;
 	OnLoadInventoryInfo.Broadcast();
+}
+
+bool UInventoryComponent::GetSaveBinaryData_Implementation(TArray<uint8>& OutBinaryData)
+{
+	FMemoryWriter Writer = FMemoryWriter(OutBinaryData);
+	FObjectAndNameAsStringProxyArchive Ar(Writer, false);
+	Ar.ArIsSaveGame = true;
+
+	this->Serialize(Ar);
+
+	return true;
+}
+
+bool UInventoryComponent::LoadSaveBinaryData_Implementation(const TArray<uint8>& NewBinaryData)
+{
+	FMemoryReader Reader = FMemoryReader(NewBinaryData);
+	FObjectAndNameAsStringProxyArchive Ar(Reader, false);
+	Ar.ArIsSaveGame = true;
+
+	this->Serialize(Ar);
+
+	OnLoadInventoryInfo.Broadcast();
+
+	return true;
 }
 
 // Called when the game starts
@@ -131,6 +182,19 @@ bool UInventoryComponent::CreateNewInventorySlot(const FItemActorInfo& NewItemIn
 	}
 
 	return false;
+}
+
+int32 UInventoryComponent::FindFreeIndexForSlot() const
+{
+	for (int32 i = 0; i < InventoryInfo.Num(); i++)
+	{
+		if (InventoryInfo[i].IsEmpty())
+		{
+			return i;
+		}
+	}
+
+	return -1;
 }
 
 // Called every frame

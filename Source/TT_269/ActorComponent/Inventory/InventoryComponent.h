@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "FunctionLibrary/TT_269_Types.h"
+#include "Interface/SavableObject.h"
 #include "InventoryComponent.generated.h"
 
 class UGameInstanceMain;
@@ -13,7 +14,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnUpdateInventorySlot, int32, Inde
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoadInventoryInfo);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class TT_269_API UInventoryComponent : public UActorComponent
+class TT_269_API UInventoryComponent : public UActorComponent, public ISavableObject
 {
 	GENERATED_BODY()
 
@@ -45,6 +46,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SaveGame")
 	void LoadInventoryInfo(const TArray<FInventorySlotInfo>& NewInventoryInfo);
 
+#pragma region ISavableObject
+	virtual bool GetSaveBinaryData_Implementation(TArray<uint8>& OutBinaryData) override;
+
+	virtual bool LoadSaveBinaryData_Implementation(const TArray<uint8>& NewBinaryData) override;
+#pragma endregion
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -57,6 +64,8 @@ protected:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Inventory")
 	UGameInstanceMain* GetGameInstanceMain() const { return GameInstanceMain; }
 
+	int32 FindFreeIndexForSlot() const;
+
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -65,6 +74,6 @@ public:
 private:
 	static UGameInstanceMain* GameInstanceMain;
 
-	UPROPERTY()
+	UPROPERTY(SaveGame)
 	TArray<FInventorySlotInfo> InventoryInfo = {};
 };

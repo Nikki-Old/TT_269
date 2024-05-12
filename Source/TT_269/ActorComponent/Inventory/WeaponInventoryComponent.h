@@ -52,8 +52,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "WeaponInventory")
 	void UpdateCurrentWeaponAmmoQuantity(int32 NewAmmoQuantity);
 
+#pragma region ISavableObject
+	virtual bool LoadSaveBinaryData_Implementation(const TArray<uint8>& NewBinaryData) override;
+#pragma endregion
+
 private:
-	UPROPERTY()
+	UPROPERTY(SaveGame)
 	TMap<EWeaponSlotType, FWeaponActorInfo> WeaponsInfo = {};
 
 	EWeaponSlotType CurrentWeaponInfoSlot = EWeaponSlotType::None_Type;

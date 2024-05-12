@@ -5,12 +5,22 @@
 
 // Add default functionality here for any ISavableObject functions that are not pure virtual.
 
-bool ISavableObject::GetSaveDataRecord_Implementation(FActorSaveData& SaveData)
+bool ISavableObject::GetActorSaveData_Implementation(FActorSaveData& SaveData)
 {
 	return false;
 }
 
-bool ISavableObject::LoadFromSaveDataRecord_Implementation(const FActorSaveData& SaveData)
+bool ISavableObject::LoadActorSaveData_Implementation(const FActorSaveData& SaveData)
+{
+	return false;
+}
+
+bool ISavableObject::GetSaveBinaryData_Implementation(TArray<uint8>& OutBinaryData)
+{
+	return false;
+}
+
+bool ISavableObject::LoadSaveBinaryData_Implementation(const TArray<uint8>& NewBinaryData)
 {
 	return false;
 }

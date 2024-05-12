@@ -57,11 +57,11 @@ struct FItemActorInfo : public FTableRowBase
 	GENERATED_BODY()
 
 	/** Item type */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemInfo")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame, Category = "ItemInfo")
 	EItemType ItemType = EItemType::None_Type;
 
 	/** Item name == RowName */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemInfo")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, SaveGame, Category = "ItemInfo")
 	FName ItemName = "";
 
 	virtual bool IsEmpty() const
@@ -86,10 +86,10 @@ struct FInventorySlotInfo : public FItemActorInfo
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "InventorySlotInfo")
 	int32 ItemQuantity = 0;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "InventorySlotInfo")
 	int32 MaxItemQuantity = 1;
 };
 
@@ -114,19 +114,19 @@ struct FProjectileInfo
 {
 	GENERATED_BODY();
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "ProjectileInfo")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "ProjectileInfo")
 	TSubclassOf<AWeaponProjectileMain> Class = nullptr;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "ProjectileInfo")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "ProjectileInfo")
 	float Damage = 0.0f;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "ProjectileInfo")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "ProjectileInfo")
 	float InitialSpeed = 0.0f;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "ProjectileInfo")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "ProjectileInfo")
 	float LifeTime = 0.0f;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "ProjectileInfo")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "ProjectileInfo")
 	UStaticMesh* Mesh = nullptr;
 };
 
@@ -136,16 +136,16 @@ struct FCharacterAnimationInfo
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "CharacterAnimation")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "CharacterAnimation")
 	UAnimSequence* IdleAnimation = nullptr;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "CharacterAnimation")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "CharacterAnimation")
 	UAnimSequence* RunAnimation = nullptr;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "CharacterAnimation")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "CharacterAnimation")
 	UAnimMontage* AttackAnimMontage = nullptr;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "CharacterAnimation")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "CharacterAnimation")
 	UAnimMontage* ReloadAnimMontage = nullptr;
 };
 
@@ -179,13 +179,13 @@ struct FWeaponDamageInfo
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponDamage")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "WeaponDamage")
 	bool bIsAutoFire = true;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponDamage")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "WeaponDamage")
 	float RateOfFire = 0.0f;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponDamage")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "WeaponDamage")
 	FProjectileInfo ProjectileInfo = FProjectileInfo();
 };
 
@@ -195,31 +195,31 @@ struct FWeaponActorInfo : public FInventorySlotInfo
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponActorInfo")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "WeaponActorInfo")
 	FName DisplayName = "";
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponActorInfo")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "WeaponActorInfo")
 	TSubclassOf<AWeaponMain> WeaponClass = nullptr;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponActorInfo")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "WeaponActorInfo")
 	EWeaponSlotType WeaponSlotType;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponActorInfo")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "WeaponActorInfo")
 	TSoftObjectPtr<UStaticMesh> PickUpMesh = nullptr;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponActorInfo")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "WeaponActorInfo")
 	FName AttachSocketName = "";
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponActorInfo | Ammo")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "WeaponActorInfo | Ammo")
 	int32 MaxAmmo = 0;
 
-	UPROPERTY(BlueprintReadWrite, Category = "WeaponActorInfo | Ammo")
+	UPROPERTY(BlueprintReadWrite, SaveGame, Category = "WeaponActorInfo | Ammo")
 	int32 CurrentAmmo = 0;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponActorInfo | Animation")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "WeaponActorInfo | Animation")
 	FCharacterAnimationInfo CharacterAnimation = FCharacterAnimationInfo();
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "WeaponActorInfo | Animation")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "WeaponActorInfo | Animation")
 	FWeaponDamageInfo WeaponDamageInfo = FWeaponDamageInfo();
 
 	FWeaponActorInfo() { ItemType = EItemType::Weapon_Type; };

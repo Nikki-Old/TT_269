@@ -30,10 +30,10 @@ public:
 
 #pragma region ISavableObject
 	/** Get Save Data */
-	virtual bool GetSaveDataRecord_Implementation(FActorSaveData& SaveData);
+	virtual bool GetActorSaveData_Implementation(FActorSaveData& SaveData);
 
 	/** Set Save Data */
-	virtual bool LoadFromSaveDataRecord_Implementation(const FActorSaveData& SaveData);
+	virtual bool LoadActorSaveData_Implementation(const FActorSaveData& SaveData);
 #pragma endregion
 
 protected:
@@ -70,7 +70,11 @@ protected:
 	UFUNCTION()
 	void ChangeSaveGameObject(USaveGameMain* NewSaveGameObject);
 
+	void LoadOwnerComponentsBinaryData(const TMap<FString, FActorComponentSaveData>& ComponentsBinaryData);
+	void GetOwnerComponentsBinaryData(TMap<FString, FActorComponentSaveData>& ComponentsBinaryData);
+
 private:
 	bool bIsSpawnedOwner = false;
 	bool bIsDestroyedOnwer = false;
+
 };

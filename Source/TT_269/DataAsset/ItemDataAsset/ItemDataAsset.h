@@ -25,6 +25,6 @@ public:
 	void GetItemInfo(FItemActorInfo& OutInfo) { OutInfo = ItemInfo; }
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "ItemDataAsset")
+	UPROPERTY(EditDefaultsOnly, SaveGame, Category = "ItemDataAsset")
 	FItemActorInfo ItemInfo = FItemActorInfo();
 };
