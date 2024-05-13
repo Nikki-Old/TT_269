@@ -66,6 +66,10 @@ protected:
 
 	int32 FindFreeIndexForSlot() const;
 
+	/** Add new item slot by index. */
+	UFUNCTION(BlueprintCallable, Category = "Game Play")
+	bool AddInventorySlotByIndex(int32 Index, const FItemActorInfo& NewItemInfo, int32 Quantity);
+
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

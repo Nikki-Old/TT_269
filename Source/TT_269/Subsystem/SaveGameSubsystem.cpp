@@ -155,15 +155,15 @@ void USaveGameSubsystem::LoadActorsData()
 	Arhive.ArNoDelta = true;
 	Serialize(Arhive);
 
-	TArray<AActor*> AllActors = {};
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), AllActors);
-	for (const auto Actor : AllActors)
-	{
-		if (!Actor->GetOuter())
-		{
-			Actor->Destroy();
-		}
-	}
+	//TArray<AActor*> AllActors = {};
+	//UGameplayStatics::GetAllActorsOfClass(GetWorld(), AActor::StaticClass(), AllActors);
+	//for (const auto Actor : AllActors)
+	//{
+	//	if (!Actor->GetOuter())
+	//	{
+	//		Actor->Destroy();
+	//	}
+	//}
 
 	{
 		TArray<AActor*> FindActors;

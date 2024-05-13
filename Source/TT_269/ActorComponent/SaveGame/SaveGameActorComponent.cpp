@@ -91,12 +91,11 @@ void USaveGameActorComponent::ChangeSaveGameObject(USaveGameMain* NewSaveGameObj
 	{
 		SaveGameObject = NewSaveGameObject;
 	}
-
-	OnLoadGameData.Broadcast();
 }
 
 void USaveGameActorComponent::LoadOwnerComponentsBinaryData(const TMap<FString, FActorComponentSaveData>& ComponentsBinaryData)
 {
+
 	TSet<UActorComponent*> OwnerComponents = GetOwner()->GetComponents();
 	FString ComponentName = "";
 	for (const auto Component : OwnerComponents)
@@ -112,10 +111,14 @@ void USaveGameActorComponent::LoadOwnerComponentsBinaryData(const TMap<FString, 
 			}
 		}
 	}
+
+	OnLoadGameData.Broadcast();
 }
 
 void USaveGameActorComponent::GetOwnerComponentsBinaryData(TMap<FString, FActorComponentSaveData>& ComponentsBinaryData)
 {
+	OnSaveGameData.Broadcast();
+
 	TSet<UActorComponent*> OwnerComponents = GetOwner()->GetComponents();
 	TArray<uint8> BinaryData = {};
 	FString ComponentName = "";
@@ -174,7 +177,7 @@ bool USaveGameActorComponent::GetActorSaveData_Implementation(FActorSaveData& Sa
 
 bool USaveGameActorComponent::LoadActorSaveData_Implementation(const FActorSaveData& SaveData)
 {
-	FActorSaveData Record = FActorSaveData();
+	FActorSaveData Record = SaveData;
 
 	FMemoryReader Reader = FMemoryReader(Record.ActorBinaryData);
 	FObjectAndNameAsStringProxyArchive Ar(Reader, false);
@@ -182,9 +185,9 @@ bool USaveGameActorComponent::LoadActorSaveData_Implementation(const FActorSaveD
 
 	GetOwner()->Serialize(Ar);
 
-	LoadOwnerComponentsBinaryData(SaveData.ActorComponentsBinaryData);
+	LoadOwnerComponentsBinaryData(Record.ActorComponentsBinaryData);
 
-	GetOwner()->SetActorTransform(SaveData.Transform);
+	GetOwner()->SetActorTransform(Record.Transform);
 
 	OnLoadGameData.Broadcast();
 

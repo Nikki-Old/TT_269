@@ -41,7 +41,7 @@ public:
 	bool IsHaveFreeSlot(EWeaponSlotType TargetType, FWeaponActorInfo& TargetInfo) const;
 
 	UFUNCTION(BlueprintCallable, Category = "WeaponInventory")
-	bool SetCurrentWeaponInfoBySlotType(EWeaponSlotType TargetSlotType, FWeaponActorInfo& CurrentWeaponInfo);
+	bool SetCurrentWeaponInfoBySlotType(EWeaponSlotType TargetSlotType, FWeaponActorInfo& CurrentWeaponInfo, bool bIsForce = false);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "WeaponInventory")
 	void GetCurrentWeaponInfoSlot(EWeaponSlotType& OutInfo) const { OutInfo = CurrentWeaponInfoSlot; }
@@ -60,5 +60,6 @@ private:
 	UPROPERTY(SaveGame)
 	TMap<EWeaponSlotType, FWeaponActorInfo> WeaponsInfo = {};
 
+	UPROPERTY(SaveGame)
 	EWeaponSlotType CurrentWeaponInfoSlot = EWeaponSlotType::None_Type;
 };

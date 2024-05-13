@@ -99,10 +99,10 @@ struct FOtherItemActorInfo : public FInventorySlotInfo
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "InventorySlotInfo")
 	FName DisplayName = "";
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Category = "InventorySlotInfo")
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "InventorySlotInfo")
 	UStaticMesh* Mesh = nullptr;
 
 	FOtherItemActorInfo() { ItemType = EItemType::Other_Type; }

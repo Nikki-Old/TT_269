@@ -38,17 +38,9 @@ bool UInventoryComponent::AddItemInfo(const FItemActorInfo& NewItemInfo, int32 Q
 				{
 					InventoryInfo[Index].ItemQuantity = InventroySlot.MaxItemQuantity;
 
-					Index = FindFreeIndexForSlot();
-					if (Index > -1)
+					if (AddInventorySlotByIndex(FindFreeIndexForSlot(), NewItemInfo, Quantity))
 					{
-						FInventorySlotInfo NewSlot = FInventorySlotInfo();
-						if (GameInstanceMain->GetInventoryInfoByItemInfo(NewItemInfo, NewSlot))
-						{
-							NewSlot.ItemQuantity += Quantity;
-							InventoryInfo[Index] = NewSlot;
-							OnUpdateInventorySlot.Broadcast(Index, NewSlot);
-							return true;
-						}
+						return true;
 					}
 
 					if (InventoryInfo.Num() < MaxQuantityInventorySlots)
@@ -66,17 +58,9 @@ bool UInventoryComponent::AddItemInfo(const FItemActorInfo& NewItemInfo, int32 Q
 				return true;
 			}
 
-			Index = FindFreeIndexForSlot();
-			if (Index > -1)
+			if (AddInventorySlotByIndex(FindFreeIndexForSlot(), NewItemInfo, Quantity))
 			{
-				FInventorySlotInfo NewSlot = FInventorySlotInfo();
-				if (GameInstanceMain->GetInventoryInfoByItemInfo(NewItemInfo, NewSlot))
-				{
-					NewSlot.ItemQuantity += Quantity;
-					InventoryInfo[Index] = NewSlot;
-					OnUpdateInventorySlot.Broadcast(Index, NewSlot);
-					return true;
-				}
+				return true;
 			}
 
 			if (InventoryInfo.Num() < MaxQuantityInventorySlots)
@@ -195,6 +179,22 @@ int32 UInventoryComponent::FindFreeIndexForSlot() const
 	}
 
 	return -1;
+}
+
+bool UInventoryComponent::AddInventorySlotByIndex(int32 Index, const FItemActorInfo& NewItemInfo, int32 Quantity)
+{
+	if (Index > -1)
+	{
+		FInventorySlotInfo NewSlot = FInventorySlotInfo();
+		if (GameInstanceMain->GetInventoryInfoByItemInfo(NewItemInfo, NewSlot))
+		{
+			NewSlot.ItemQuantity += Quantity;
+			InventoryInfo[Index] = NewSlot;
+			OnUpdateInventorySlot.Broadcast(Index, NewSlot);
+			return true;
+		}
+	}
+	return false;
 }
 
 // Called every frame

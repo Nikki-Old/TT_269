@@ -28,6 +28,12 @@ void APickUpActor::BeginPlay()
 {
 	Super::BeginPlay();
 
+	Initialize();
+}
+
+void APickUpActor::Initialize_Implementation()
+{
+	// In BP
 }
 
 // Called every frame

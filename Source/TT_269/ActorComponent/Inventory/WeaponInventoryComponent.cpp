@@ -67,9 +67,9 @@ bool UWeaponInventoryComponent::IsHaveFreeSlot(EWeaponSlotType TargetType, FWeap
 	return false;
 }
 
-bool UWeaponInventoryComponent::SetCurrentWeaponInfoBySlotType(EWeaponSlotType TargetSlotType, FWeaponActorInfo& CurrentWeaponInfo)
+bool UWeaponInventoryComponent::SetCurrentWeaponInfoBySlotType(EWeaponSlotType TargetSlotType, FWeaponActorInfo& CurrentWeaponInfo, bool bIsForce)
 {
-	if (CurrentWeaponInfoSlot != TargetSlotType)
+	if (CurrentWeaponInfoSlot != TargetSlotType || bIsForce)
 	{
 		if (WeaponsInfo.Contains(TargetSlotType) && !WeaponsInfo[TargetSlotType].IsEmpty()) 
 		{

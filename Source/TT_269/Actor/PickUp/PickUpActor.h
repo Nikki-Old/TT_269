@@ -81,6 +81,14 @@ protected:
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, SaveGame, Category = "PickUp", meta = (ExposeOnSpawn = true))
 	UItemDataAsset* ItemDataAsset = nullptr;
 
+	/** Initialize metod: */
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "PickUp")
+	void Initialize();
+	void Initialize_Implementation();
+
+	UPROPERTY(BlueprintReadWrite, SaveGame, Category = "PickUp")
+	bool bIsInitialized = false;
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
